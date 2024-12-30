@@ -80,11 +80,11 @@
    - Prepare next year's plan
 
 ### Daily Schedule Overview ⏰
-06:30 - 07:00: Reading (First session) 📖
-07:00 - 08:00: Exercise 🏃
-08:00 - 08:30: Breakfast 🍳
-08:30 - 09:30: Coding 💻
-09:00 - 19:00: Work 💼
-20:00 - 21:00: Exercise (alternative time slot) 🏋️
-21:30 - 23:30: Reading (Second session) 📚
-23:30: Bedtime 😴
+- 06:30 - 07:00: Reading (First session) 📖
+- 07:00 - 08:00: Exercise 🏃
+- 08:00 - 08:30: Breakfast 🍳
+- 08:30 - 09:30: Coding 💻
+- 09:00 - 19:00: Work 💼
+- 20:00 - 21:00: Exercise (alternative time slot) 🏋️
+- 21:30 - 23:30: Reading (Second session) 📚
+- 23:30: Bedtime 😴
