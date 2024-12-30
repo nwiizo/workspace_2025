@@ -1,0 +1,25 @@
+name: Auto Close DevOps Tool Issues
+
+on:
+  schedule:
+    # 毎月末日の23:50 JSTに実行
+    - cron: '50 14 28-31 * *'
+  workflow_dispatch:
+
+jobs:
+  close-issues:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Close DevOps Tool Development Issue
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [[ "$(date -d '+1 day' +%d)" == "01" ]]; then
+            current_month=$(date +%B)
+            issue_number=$(gh issue list --search "DevOps tool development for ${current_month} 2025" --json number --jq '.[0].number')
+            if [ -n "${issue_number}" ]; then
+              gh issue close "${issue_number}" -c "自動クローズ: ${current_month}のDevOpsツール開発完了"
+            fi
+          fi
