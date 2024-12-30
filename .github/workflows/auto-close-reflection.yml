@@ -1,0 +1,26 @@
+name: Auto Close Monthly Reflection
+
+on:
+  schedule:
+    # 毎月末日の23:50 JSTに実行
+    - cron: '50 14 28-31 * *'
+
+jobs:
+  close-issues:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Close Monthly Reflection Issues
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # 現在の日付が月末かチェック
+          if [[ "$(date -d '+1 day' +%d)" == "01" ]]; then
+            # 現在の月のイシューを検索してクローズ
+            current_month=$(date +%B)
+            issue_number=$(gh issue list --search "Monthly Reflection - $current_month 2025" --json number --jq '.[0].number')
+            if [ ! -z "$issue_number" ]; then
+              gh issue close $issue_number -c "自動クローズ: 月末レビュー完了"
+            fi
+          fi
