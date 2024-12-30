@@ -4,6 +4,7 @@ on:
   schedule:
     # 毎月末日の23:50 JSTに実行
     - cron: '50 14 28-31 * *'
+  workflow_dispatch:  # 手動実行を可能にする
 
 jobs:
   close-issues:
@@ -19,8 +20,8 @@ jobs:
           if [[ "$(date -d '+1 day' +%d)" == "01" ]]; then
             # 現在の月のイシューを検索してクローズ
             current_month=$(date +%B)
-            issue_number=$(gh issue list --search "Monthly Reflection - $current_month 2025" --json number --jq '.[0].number')
-            if [ ! -z "$issue_number" ]; then
-              gh issue close $issue_number -c "自動クローズ: 月末レビュー完了"
+            issue_number=$(gh issue list --search "Monthly Reflection - ${current_month} 2025" --json number --jq '.[0].number')
+            if [ -n "${issue_number}" ]; then
+              gh issue close "${issue_number}" -c "自動クローズ: 月末レビュー完了"
             fi
           fi
