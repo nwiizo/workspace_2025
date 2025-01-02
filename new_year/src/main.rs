@@ -1,3 +1,4 @@
+use chrono::{Datelike, Local};
 use colored::*;
 use rand::Rng;
 use std::{thread, time::Duration};
@@ -254,7 +255,7 @@ fn draw_frame(fireworks: &Vec<Firework>, frame_count: u32) {
     }
 }
 
-fn display_big_text(_: &str, color: Color) {
+fn display_big_text(year: i32, color: Color) {
     let happy = vec![
         "██╗  ██╗ █████╗ ██████╗ ██████╗ ██╗   ██╗",
         "██║  ██║██╔══██╗██╔══██╗██╔══██╗╚██╗ ██╔╝",
@@ -273,7 +274,7 @@ fn display_big_text(_: &str, color: Color) {
         "╚═╝  ╚═══╝╚══════╝ ╚══╝╚══╝ ",
     ];
 
-    let year = vec![
+    let year_text = vec![
         "██╗   ██╗███████╗ █████╗ ██████╗ ",
         "╚██╗ ██╔╝██╔════╝██╔══██╗██╔══██╗",
         " ╚████╔╝ █████╗  ███████║██████╔╝",
@@ -282,16 +283,104 @@ fn display_big_text(_: &str, color: Color) {
         "   ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝",
     ];
 
-    let year_num = vec![
-        "██████╗  ██████╗ ██████╗ ███████╗",
-        "╚════██╗██╔═████╗╚════██╗██╔════╝",
-        " █████╔╝██║██╔██║ █████╔╝███████╗",
-        "██╔═══╝ ████╔╝██║██╔═══╝ ╚════██║",
-        "███████╗╚██████╔╝███████╗███████║",
-        "╚══════╝ ╚═════╝ ╚══════╝╚══════╝",
+    let digit_art = [
+        // 0
+        vec![
+            "██████╗ ",
+            "██╔══██╗",
+            "██║  ██║",
+            "██║  ██║",
+            "╚█████╔╝",
+            " ╚════╝ ",
+        ],
+        // 1
+        vec![" ██╗", "███║", "╚██║", " ██║", " ██║", " ╚═╝"],
+        // 2
+        vec![
+            "██████╗ ",
+            "╚════██╗",
+            " █████╔╝",
+            "██╔═══╝ ",
+            "███████╗",
+            "╚══════╝",
+        ],
+        // 3
+        vec![
+            "██████╗ ",
+            "╚════██╗",
+            " █████╔╝",
+            " ╚═══██╗",
+            "██████╔╝",
+            "╚═════╝ ",
+        ],
+        // 4
+        vec![
+            "██╗  ██╗",
+            "██║  ██║",
+            "███████║",
+            "╚════██║",
+            "     ██║",
+            "     ╚═╝",
+        ],
+        // 5
+        vec![
+            "██████╗ ",
+            "██╔═══╝ ",
+            "██████╗ ",
+            "╚════██╗",
+            "██████╔╝",
+            "╚═════╝ ",
+        ],
+        // 6
+        vec![
+            " █████╗ ",
+            "██╔═══╝ ",
+            "██████╗ ",
+            "██╔══██╗",
+            "╚█████╔╝",
+            " ╚════╝ ",
+        ],
+        // 7
+        vec![
+            "██████╗ ",
+            "╚════██╗",
+            "    ██╔╝",
+            "   ██╔╝ ",
+            "   ██║  ",
+            "   ╚═╝  ",
+        ],
+        // 8
+        vec![
+            " █████╗ ",
+            "██╔══██╗",
+            "╚█████╔╝",
+            "██╔══██╗",
+            "╚█████╔╝",
+            " ╚════╝ ",
+        ],
+        // 9
+        vec![
+            " █████╗ ",
+            "██╔══██╗",
+            "╚██████║",
+            " ╚═══██║",
+            " █████╔╝",
+            " ╚════╝ ",
+        ],
     ];
 
-    let words = [happy, new, year, year_num];
+    let year_digits: Vec<char> = year.to_string().chars().collect();
+    let mut year_lines = vec!["".to_string(); 6];
+    for i in 0..6 {
+        for &digit in &year_digits {
+            let digit_idx = digit.to_digit(10).unwrap() as usize;
+            year_lines[i].push_str(digit_art[digit_idx][i]);
+            year_lines[i].push(' ');
+        }
+    }
+
+    let year_art: Vec<&str> = year_lines.iter().map(|s| s.as_str()).collect();
+    let words = [&happy[..], &new[..], &year_text[..], &year_art[..]];
     let mut frame_count = 0;
 
     for i in 0..6 {
@@ -305,9 +394,9 @@ fn display_big_text(_: &str, color: Color) {
     }
 }
 
-fn display_new_year_message() {
+fn display_new_year_message(year: i32) {
     println!("\n\n");
-    display_big_text("", Color::Rainbow);
+    display_big_text(year, Color::Rainbow);
     println!("\n");
 
     let messages = [
@@ -339,6 +428,9 @@ fn display_new_year_message() {
 }
 
 fn main() {
+    // Get current year
+    let year = Local::now().year();
+
     let mut fireworks = Vec::new();
     let mut frame_count = 0;
 
@@ -359,7 +451,7 @@ fn main() {
 
         if frame_count > 300 {
             clear_screen();
-            display_new_year_message();
+            display_new_year_message(year);
             break;
         }
     }
