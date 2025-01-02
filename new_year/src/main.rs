@@ -1,6 +1,7 @@
 use chrono::{Datelike, Local};
 use colored::*;
 use rand::Rng;
+use std::thread::sleep;
 use std::{thread, time::Duration};
 
 struct Firework {
@@ -385,6 +386,7 @@ fn display_big_text(year: i32, color: Color) {
 
     for i in 0..6 {
         for word in &words {
+            sleep(Duration::from_millis(100));
             print!("{} ", color.get_colored_char('✧', frame_count).to_string());
             print!("{}", word[i]);
             print!("{} ", color.get_colored_char('✧', frame_count).to_string());
