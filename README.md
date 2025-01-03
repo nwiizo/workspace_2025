@@ -8,7 +8,7 @@
    - [ ] Limit snacks to fruits or sugar-free tea only
 
 2. **Kickboxing Training:** 🥊
-   - [ ] Join kickboxing gym and attend 3 sessions per week
+   - [ ] Join kickboxing gym and attend 5 sessions per week
    - [ ] Practice basic combinations daily (30 minutes)
    - [ ] Participate in sparring sessions twice a month
    - [ ] Set timeline for amateur match debut
