@@ -1,22 +1,53 @@
 # workspace_2025 🎯
 
-### Goal: Achieve 69kg Weight & Avoid 'E' Rating in Health Check 💪
+### Goal: Achieve 69kg Weight & Amateur Kickboxing Match 🥊
 1. **Implement Healthy Diet Plan:** 🥗
    - [ ] Create specific meal plans targeting 1800kcal daily
    - [ ] Consume at least 350g of vegetables per meal
    - [ ] Weekly meal logging and review
    - [ ] Limit snacks to fruits or sugar-free tea only
 
-2. **Establish Regular Exercise Routine:** 🏃
-   - [ ] Secure exercise time on weekdays (07:00-08:00 or 20:00-21:00)
-   - [ ] Track daily steps (Target: 12,000 steps on weekdays, 8,000 on weekends)
-   - [ ] Renew gym membership and use it at least 3 times per week
-   - [ ] Try one new exercise activity each month
+2. **Kickboxing Training:** 🥊
+   - [ ] Join kickboxing gym and attend 3 sessions per week
+   - [ ] Practice basic combinations daily (30 minutes)
+   - [ ] Participate in sparring sessions twice a month
+   - [ ] Set timeline for amateur match debut
 
 3. **Health Monitoring:** ⚕️
    - [ ] Measure and record weight and body fat percentage every Monday
    - [ ] Compare health check data every three months
    - [ ] Maintain sleep schedule (23:30 - 06:30)
+
+### Goal: Develop Monthly OSS for DevOps 🛠️
+1. **Project Planning:** 📋
+   - [ ] Create roadmap for 12 DevOps tools
+   - [ ] Research existing solutions and identify gaps
+   - [ ] Set up project templates and CI/CD pipelines
+
+2. **Development Schedule:** ⚙️
+   - [ ] Allocate first week of each month for new project initialization
+   - [ ] Second and third weeks for core development
+   - [ ] Fourth week for testing, documentation, and release
+
+3. **Community Engagement:** 🤝
+   - [ ] Regular updates on tech blog about project progress
+   - [ ] Active participation in DevOps communities
+   - [ ] Gather feedback and iterate on tools
+
+### Goal: Write Technical Book & Translation Work 📚
+1. **Technical Book Writing:** ✍️
+   - [ ] Define book outline and chapter structure by end of January
+   - [ ] Write minimum 1000 words per week
+   - [ ] Complete first draft by June
+   - [ ] Review and revision phase: July-September
+   - [ ] Final manuscript submission: October
+
+2. **Translation Project:** 🌐
+   - [ ] Select technical book for translation by February
+   - [ ] Create translation schedule and milestones
+   - [ ] Complete rough translation by August
+   - [ ] Review and polish by November
+   - [ ] Final submission: December
 
 ### Goal: Code Every Day 💻
 1. **Daily Coding Practice:** ⌨️
