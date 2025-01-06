@@ -2,6 +2,9 @@
 
 A whimsical command-line joke program that celebrates the New Year with ASCII fireworks! Because who doesn't need fireworks in their terminal?
 
+posted by [nwiizo](https://twitter.com/nwiizo) on [GitHub](https://github.com/nwiizo/workspace_2025/new_year)  
+blog post: [じゃあ、おうちで学べる](https://syu-m-5151.hatenablog.com/entry/2025/01/04/120812)  
+
 ## 🎡 What is this?
 
 This is a fun, completely unnecessary, but surprisingly entertaining terminal program that:
