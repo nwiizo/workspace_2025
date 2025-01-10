@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n            INSERT INTO loans (id, book_id, user_id, loan_date, due_date, status)\n            VALUES (?, ?, ?, ?, ?, ?)\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 6
+    },
+    "nullable": []
+  },
+  "hash": "d3f494c93ab6f32f7d138749c35e49279c1fe10b9c90ae579ccaba791a4b2dbd"
+}

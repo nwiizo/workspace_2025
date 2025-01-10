@@ -1,0 +1,11 @@
+version: v1
+plugins:
+  - plugin: buf.build/protocolbuffers/rust:v25.1
+    out: ../library-server/src
+    opt:
+      - bytes=bytes
+  - plugin: buf.build/community/neoeinstein-tonic-rust:v0.3.0
+    out: ../library-server/src
+    opt:
+      - no_client=false
+      - no_server=false

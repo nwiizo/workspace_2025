@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n            UPDATE loans \n            SET status = ?, return_date = ?\n            WHERE id = ?\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 3
+    },
+    "nullable": []
+  },
+  "hash": "6e1616c138bdd896ae2a8ad7e76bbebdaa300a25918662104ed301452dc30a50"
+}

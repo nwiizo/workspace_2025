@@ -1,0 +1,56 @@
+{
+  "db_name": "SQLite",
+  "query": "\n            SELECT id, book_id, user_id, loan_date, due_date, return_date, status\n            FROM loans \n            WHERE id = ? AND status = ?\n            ",
+  "describe": {
+    "columns": [
+      {
+        "name": "id",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "book_id",
+        "ordinal": 1,
+        "type_info": "Text"
+      },
+      {
+        "name": "user_id",
+        "ordinal": 2,
+        "type_info": "Text"
+      },
+      {
+        "name": "loan_date",
+        "ordinal": 3,
+        "type_info": "Datetime"
+      },
+      {
+        "name": "due_date",
+        "ordinal": 4,
+        "type_info": "Datetime"
+      },
+      {
+        "name": "return_date",
+        "ordinal": 5,
+        "type_info": "Datetime"
+      },
+      {
+        "name": "status",
+        "ordinal": 6,
+        "type_info": "Int64"
+      }
+    ],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": [
+      true,
+      false,
+      false,
+      false,
+      false,
+      true,
+      false
+    ]
+  },
+  "hash": "f983499009eb8560f62dbd51dfc47fbf77ab2e5386e12b56fab5402f9767fec6"
+}

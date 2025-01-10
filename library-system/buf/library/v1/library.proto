@@ -1,0 +1,101 @@
+syntax = "proto3";
+package library.v1;
+
+import "google/protobuf/timestamp.proto";
+
+// ユーザー情報
+message User {
+    string id = 1;
+    string name = 2;
+    string email = 3;
+}
+
+// 書籍情報
+message Book {
+    string id = 1;
+    string title = 2;
+    string author = 3;
+    string isbn = 4;
+    bool available = 5;
+}
+
+// 貸出状態
+enum LoanStatus {
+    LOAN_STATUS_UNSPECIFIED = 0;
+    LOAN_STATUS_ACTIVE = 1;
+    LOAN_STATUS_RETURNED = 2;
+    LOAN_STATUS_OVERDUE = 3;
+}
+
+// 貸出情報
+message Loan {
+    string id = 1;
+    string book_id = 2;
+    string user_id = 3;
+    google.protobuf.Timestamp loan_date = 4;
+    google.protobuf.Timestamp due_date = 5;
+    google.protobuf.Timestamp return_date = 6;
+    LoanStatus status = 7;
+}
+
+// リクエスト/レスポンス定義
+message CreateUserRequest {
+    string name = 1;
+    string email = 2;
+}
+
+message CreateUserResponse {
+    User user = 1;
+}
+
+message GetUserRequest {
+    string user_id = 1;
+}
+
+message GetUserResponse {
+    User user = 1;
+}
+
+message SearchBooksRequest {
+    string query = 1;
+    int32 page_size = 2;
+    int32 page_number = 3;
+}
+
+message SearchBooksResponse {
+    repeated Book books = 1;
+    int32 total_count = 2;
+    int32 total_pages = 3;
+}
+
+message CreateLoanRequest {
+    string book_id = 1;
+    string user_id = 2;
+}
+
+message CreateLoanResponse {
+    Loan loan = 1;
+}
+
+message ReturnBookRequest {
+    string loan_id = 1;
+}
+
+message ReturnBookResponse {
+    bool success = 1;
+    Loan loan = 2;
+}
+
+// 図書サービス
+service LibraryService {
+    // ユーザー管理
+    rpc CreateUser(CreateUserRequest) returns (CreateUserResponse);
+    rpc GetUser(GetUserRequest) returns (GetUserResponse);
+
+    // 書籍管理
+    rpc SearchBooks(SearchBooksRequest) returns (SearchBooksResponse);
+
+    // 貸出管理
+    rpc CreateLoan(CreateLoanRequest) returns (CreateLoanResponse);
+    rpc ReturnBook(ReturnBookRequest) returns (ReturnBookResponse);
+}
