@@ -1,4 +1,4 @@
-# コンテナ技術実践ワークショップ 2025年冬
+# コンテナ技術実践ワークショップ 2025年冬 001
 
 ## 概要
 このワークショップでは、最新のコンテナ技術とKubernetesの基礎から実践的な使用方法まで学びます。2025年の開発現場で必要とされるスキルを身につけることを目指します。
@@ -34,24 +34,24 @@ kubectl cluster-info
 
 #### 実行
 今、デプロイしたKubernetes cluster にnginx をデプロイします
-```
-# kubectl run nginx --image=nginx --replicas=3
-kubectl run --generator=deployment/apps.v1 is DEPRECATED and will be removed in a future version. Use kubectl run --generator=run-pod/v1 or kubectl create instead.
+```bash
+kubectl run nginx --image=nginx --replicas=3
+kubectl run --generator=deployment/apps.v1 は非推奨であり、将来のバージョンで削除されます。代わりに kubectl run --generator=run-pod/v1 または kubectl create を使用してください。
 deployment.apps/nginx created
 ```
 
 #### 確認
 今、デプロイしたものを確認します
-```
-# kubectl get deploy
+```bash
+kubectl get deploy
 NAME              READY   UP-TO-DATE   AVAILABLE   AGE
 nginx             3/3     3            3           49s
 
-# kubectl get rs
+kubectl get rs
 NAME                         DESIRED   CURRENT   READY   AGE
 nginx-6db489d4b7             3         3         3       68s
 
-# kubectl get pod
+kubectl get pod
 NAME                               READY   STATUS    RESTARTS   AGE
 nginx-6db489d4b7-2djdm             1/1     Running   0          5m44s
 nginx-6db489d4b7-2vhs8             1/1     Running   0          5m44s
@@ -60,15 +60,15 @@ nginx-6db489d4b7-lrgcd             1/1     Running   0          5m44s
 
 #### 削除
 Pod を削除する
-```
-# kubectl delete pod nginx-6db489d4b7-2djdm nginx-6db489d4b7-2vhs8 nginx-6db489d4b7-lrgcd
+```bash
+kubectl delete pod nginx-6db489d4b7-2djdm nginx-6db489d4b7-2vhs8 nginx-6db489d4b7-lrgcd
 pod "nginx-6db489d4b7-2djdm" deleted
 pod "nginx-6db489d4b7-2vhs8" deleted
 pod "nginx-6db489d4b7-lrgcd" deleted
 ```
 削除したリソースを確認する
 ```
-# kubectl get pod
+kubectl get pod
 NAME                               READY   STATUS    RESTARTS   AGE
 nginx-6db489d4b7-6sgnz             1/1     Running   0          16s
 nginx-6db489d4b7-nhfvh             1/1     Running   0          16s
@@ -76,20 +76,20 @@ nginx-6db489d4b7-tl7m8             1/1     Running   0          16s
 ```
 Podを削除しても上位のリソースが存在しているので残り続ける。次にreplicaset を削除する
 ```
-# kubectl get rs
+kubectl get rs
 NAME                         DESIRED   CURRENT   READY   AGE
 nginx-6db489d4b7             3         3         3       29m
 
 # 次はrs を削除する
-# kubectl delete rs/nginx-6db489d4b7
+kubectl delete rs/nginx-6db489d4b7
 replicaset.apps "nginx-6db489d4b7" deleted
 
-# kubectl get rs
+kubectl get rs
 NAME                         DESIRED   CURRENT   READY   AGE
 nginx-6db489d4b7             3         3         3       78s
 
 # 上位リソースが削除されたのでpod も削除されました
-# kubectl get pod
+kubectl get pod
 NAME                               READY   STATUS    RESTARTS   AGE
 nginx-6db489d4b7-8cq4x             1/1     Running   0          74s
 nginx-6db489d4b7-cgknc             1/1     Running   0          74s
@@ -100,7 +100,7 @@ NAME              READY   UP-TO-DATE   AVAILABLE   AGE
 nginx             3/3     3            3           34m
 
 # deployments の削除
-kubectl delete deployments/nginx
+kubectl delete deployment/nginx
 deployment.apps "nginx" deleted
 
 #他のリソースも削除されているので確認してみてください
@@ -134,18 +134,18 @@ spec:
 
 resourceの取得
 ```
-kubectl get pods rs
+kubectl get pods,rs
 ```
 
 詳細の取得
 ```
 kubectl describe pod/<name>
-kubectl describe deployments <name>
+kubectl describe deployment <name>
 ```
 
 resourceの削除
 ```
-kubectl delete pods rs
+kubectl delete pods,rs
 ```
 
 
@@ -330,14 +330,14 @@ kubectl apply -f service.yaml
 
 2. [リソースの確認](https://kubernetes.io/docs/reference/kubectl/cheatsheet/#viewing-and-finding-resources)
 ```bash
-kubectl get configmap,deployment,service
-kubectl describe deployment myapp
+kubectl get configmap,deployment,service -l app=myapp
+kubectl describe deployment myapp -l app=myapp
 kubectl get pods -l app=myapp
 ```
 
 3. [アプリケーションへのアクセス](https://kubernetes.io/docs/tasks/access-application-cluster/access-cluster/#manually-constructing-apiserver-proxy-urls)
 ```bash
-# kubectl proxyを使用したアクセス
+kubectl proxyを使用したアクセス
 kubectl proxy &
 curl http://localhost:8001/api/v1/namespaces/default/services/myapp-service/proxy/
 ```
@@ -457,7 +457,7 @@ helm install myapp-release ./myapp
 3. [デプロイの確認](https://helm.sh/docs/helm/helm_status/)
 ```bash
 helm list
-kubectl get all -l app.kubernetes.io/name=myapp
+kubectl get all -l app=myapp
 ```
 
 ### 発展課題

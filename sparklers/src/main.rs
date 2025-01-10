@@ -3,24 +3,24 @@ use rand::Rng;
 use std::{thread, time::Duration};
 
 struct Senko {
-    base_x: f64, // 紐の位置
-    base_y: f64, // 紐の長さ
-    fire_y: f64, // 火元の現在位置
-    sparks: Vec<Spark>,
-    lifetime: i32,
-    string_length: usize,
-    falling: bool,
-    fall_speed: f64,
+    base_x: f64,          // 紐の位置 (x-coordinate of the string)
+    base_y: f64,          // 紐の長さ (length of the string)
+    fire_y: f64,          // 火元の現在位置 (current position of the fire source)
+    sparks: Vec<Spark>,   // 火花のベクター (vector of sparks)
+    lifetime: i32,        // 線香花火の寿命 (lifetime of the Senko Hanabi)
+    string_length: usize, // 紐の長さ (length of the string)
+    falling: bool,        // 線香花火が落ちているかどうか (whether the Senko Hanabi is falling)
+    fall_speed: f64,      // 落下速度 (falling speed)
 }
 
 struct Spark {
-    x: f64,
-    y: f64,
-    vx: f64,
-    vy: f64,
-    lifetime: i32,
-    char: char,
-    temperature: f64, // 0.0 (cold) to 1.0 (hot)
+    x: f64,           // 火花の現在のx座標
+    y: f64,           // 火花の現在のy座標
+    vx: f64,          // 火花のx方向の速度
+    vy: f64,          // 火花のy方向の速度
+    lifetime: i32,    // 火花の寿命（フレーム数）
+    char: char,       // 火花を表す文字
+    temperature: f64, // 火花の温度（0.0（冷たい）から1.0（熱い）まで）
 }
 
 impl Senko {
@@ -201,15 +201,18 @@ fn clear_screen() {
 }
 
 fn main() {
+    // 線香花火のシミュレーションを開始
     println!("線香花火をお楽しみください...");
     thread::sleep(Duration::from_secs(2));
     clear_screen();
 
+    // 線香花火の初期位置を設定
     let mut senko = Senko::new(40.0);
 
+    // 線香花火が終了するまでループ
     while !senko.is_done() {
-        senko.update();
-        draw_frame(&senko);
-        thread::sleep(Duration::from_millis(50));
+        senko.update(); // 線香花火の状態を更新
+        draw_frame(&senko); // 現在のフレームを描画
+        thread::sleep(Duration::from_millis(50)); // 少し待機して次のフレームへ
     }
 }
