@@ -3,11 +3,12 @@
 ## 目次
 1. [概要](#概要)
 2. [Prometheusの実装](#prometheusの実装)
-3. [Grafanaの設定](#grafanaの設定)
-4. [アラート設定](#アラート設定)
-5. [高度な設定とチューニング](#高度な設定とチューニング)
-6. [トラブルシューティング](#トラブルシューティング)
-7. [参考資料](#参考資料)
+3. [課題](#課題)
+4. [Grafanaの設定](#grafanaの設定)
+5. [アラート設定](#アラート設定)
+6. [高度な設定とチューニング](#高度な設定とチューニング)
+7. [トラブルシューティング](#トラブルシューティング)
+8. [参考資料](#参考資料)
 
 ## 概要
 
@@ -210,6 +211,14 @@ spec:
         summary: Container {{ $labels.container }} in pod {{ $labels.pod }} has high memory usage
         description: Container {{ $labels.container }} in pod {{ $labels.namespace }}/{{ $labels.pod }} is using more than 80% of its memory limit for the last 10 minutes
 ```
+
+## 課題
+
+### 1. メトリクスの収集
+- Goアプリケーションにメトリクスを追加するための実装してください。
+
+### 2. ブラックボックス監視
+- blackbox-exporterを使用して、サービスの可用性を監視する設定を行ってください。
 
 ## Grafanaの設定
 
@@ -450,6 +459,7 @@ prometheus:
       maxSamples: 50000000
       timeout: 2m
       maxConcurrency: 20
+```
 
 #### 2. メトリクスの収集遅延
 症状：

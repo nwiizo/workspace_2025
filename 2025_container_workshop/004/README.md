@@ -4,9 +4,10 @@
 1. [GitOpsとArgo CDの概要](#gitopsとargo-cdの概要)
 2. [Argo CDのインストール](#argo-cdのインストール)
 3. [アプリケーションのデプロイ](#アプリケーションのデプロイ)
-4. [高度な設定](#高度な設定)
-5. [トラブルシューティング](#トラブルシューティング)
-6. [参考資料](#参考資料)
+4. [課題](#課題)
+5. [高度な設定](#高度な設定)
+6. [トラブルシューティング](#トラブルシューティング)
+7. [参考資料](#参考資料)
 
 ## GitOpsとArgo CDの概要
 
@@ -75,116 +76,10 @@ kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.pas
 127.0.0.1 argocd.local
 ```
 
-## アプリケーションのデプロイ
+## 課題
 
 ### サンプルアプリケーションのデプロイ
-以下の例は、先ほど作成したOpenTelemetryが実装されたワークショップアプリケーションをデプロイする設定です。
-
-1. まずアプリケーションのマニフェストをGitリポジトリに配置します：
-
-```yaml
-# workshop-app/base/deployment.yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: workshop-app
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: workshop-app
-  template:
-    metadata:
-      labels:
-        app: workshop-app
-    spec:
-      containers:
-      - name: workshop-app
-        image: workshop-app:latest
-        ports:
-        - containerPort: 8080
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: workshop-app
-spec:
-  selector:
-    app: workshop-app
-  ports:
-  - port: 8080
-    targetPort: 8080
-```
-
-2. Kustomizeを使用して環境ごとの設定を管理します：
-
-```yaml
-# workshop-app/overlays/dev/kustomization.yaml
-apiVersion: kustomize.config.k8s.io/v1beta1
-kind: Kustomization
-
-bases:
-  - ../../base
-
-namespace: workshop-dev
-
-patches:
-- patch: |-
-    - op: replace
-      path: /spec/replicas
-      value: 1
-  target:
-    kind: Deployment
-    name: workshop-app
-```
-
-```yaml
-# workshop-app/overlays/prod/kustomization.yaml
-apiVersion: kustomize.config.k8s.io/v1beta1
-kind: Kustomization
-
-bases:
-  - ../../base
-
-namespace: workshop-prod
-
-patches:
-- patch: |-
-    - op: replace
-      path: /spec/replicas
-      value: 3
-  target:
-    kind: Deployment
-    name: workshop-app
-```
-
-3. Argo CDアプリケーションの定義：
-
-```yaml
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  name: workshop-app-dev
-  namespace: argocd
-spec:
-  project: default
-  source:
-    repoURL: https://github.com/yourusername/workshop-app.git
-    targetRevision: HEAD
-    path: workshop-app/overlays/dev
-  destination:
-    server: https://kubernetes.default.svc
-    namespace: workshop-dev
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
-```
-
-4. アプリケーションのデプロイ：
-```bash
-kubectl apply -f workshop-app-application.yaml
-```
+以下の例は、先ほど作成したOpenTelemetryが実装されたワークショップアプリケーションをデプロイしてください。
 
 ## 高度な設定
 
