@@ -1,0 +1,10 @@
+[serve]
+# 開発サーバーのアドレス
+address = "127.0.0.1"
+# ポート番号
+port = 8080
+# アセットディレクトリ
+assets = ["public"]
+# プロキシ設定（APIサーバーなど）
+[[proxy]]
+backend = "http://localhost:3000/api/"
