@@ -7,10 +7,11 @@ Yamori is a test runner and visualizer for command-line applications. It allows 
 - Define tests in TOML or YAML format
 - Run commands with arguments and input
 - Compare actual output with expected output
-- Visualize test results in a terminal UI or CLI mode
+- Visualize test results in a terminal UI or simple CLI output
 - Support for timeouts
 - Support for pre-build commands
 - Per-test build configuration
+- Color-coded test results
 
 ## Directory Structure
 
@@ -56,7 +57,7 @@ Or with the environment variable:
 YAMORI_CONFIG=tests/configs/tests.yaml cargo run -- --cli
 ```
 
-In CLI mode, Yamori will run all tests and print the results to stdout, then exit. This is useful for CI/CD pipelines or when you want to run tests without the interactive UI.
+In CLI mode, Yamori will run all tests and display a compact summary of the results. Only failed tests will show detailed information. This is useful for CI/CD pipelines or when you want a quick overview of test results.
 
 ## Configuration Format
 
