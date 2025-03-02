@@ -2,6 +2,7 @@
 mod app;
 mod test;
 mod ui;
+mod cli;
 
 use anyhow::{Context, Result};
 use app::{App, PopupType};
@@ -24,6 +25,10 @@ struct Args {
     /// Path to the test configuration file (YAML or TOML)
     #[arg(short = 'y', long = "yamori-config", default_value = "tests/configs/tests.toml")]
     config: std::path::PathBuf,
+
+    /// Run in CLI mode (no TUI)
+    #[arg(short = 'c', long = "cli", default_value = "false")]
+    cli_mode: bool,
 }
 
 fn main() -> Result<()> {
@@ -36,6 +41,11 @@ fn main() -> Result<()> {
     // 環境変数から設定ファイルのパスが指定されていれば、それを優先
     if let Some(config_path) = config_from_env {
         args.config = PathBuf::from(config_path);
+    }
+    
+    // Check if CLI mode is enabled
+    if args.cli_mode {
+        return cli::run_cli(args.config);
     }
     
     // コマンド出力を抑制
