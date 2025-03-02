@@ -1,16 +1,6 @@
 # Test Configurations
 
-This directory contains example test configurations for Yamori.
-
-## Available Configurations
-
-- `tests.toml` - Example configuration in TOML format
-- `tests.yaml` - Example configuration in YAML format
-
-## Documentation
-
-For detailed documentation on the configuration format, please see:
-- [Configuration Format Documentation](../../docs/CONFIG_FORMAT.md)
+This directory contains configuration files for Yamori tests.
 
 ## File Formats
 

@@ -18,7 +18,7 @@ test-debug:
 		echo "Usage: make test-debug CONFIG=<config_file>"; \
 		exit 1; \
 	fi
-	./run_tests_debug.sh "$(CONFIG)"
+	./scripts/run_tests_debug.sh "$(CONFIG)"
 
 # テスト実行（リリースビルド）
 test-release:
@@ -27,7 +27,7 @@ test-release:
 		echo "Usage: make test-release CONFIG=<config_file>"; \
 		exit 1; \
 	fi
-	./run_tests_release.sh "$(CONFIG)"
+	./scripts/run_tests_release.sh "$(CONFIG)"
 
 # テスト実行（デフォルトはデバッグビルド）
 test:
@@ -36,14 +36,60 @@ test:
 		echo "Usage: make test CONFIG=<config_file>"; \
 		exit 1; \
 	fi
-	./run_tests_debug.sh "$(CONFIG)"
+	./scripts/run_tests_debug.sh "$(CONFIG)"
+
+# 特定のテストを実行
+run-test:
+	@if [ -z "$(TEST)" ]; then \
+		echo "Error: TEST variable not set"; \
+		echo "Usage: make run-test TEST=<test_name> [CONFIG=<config_file>]"; \
+		exit 1; \
+	fi
+	@if [ -z "$(CONFIG)" ]; then \
+		CONFIG="tests/configs/tests.toml"; \
+	fi
+	./scripts/run_tests.sh "$(CONFIG)" "$(TEST)"
+
+# CLIモードでテストを実行
+test-cli:
+	@if [ -z "$(CONFIG)" ]; then \
+		echo "Error: CONFIG variable not set"; \
+		echo "Usage: make test-cli CONFIG=<config_file>"; \
+		exit 1; \
+	fi
+	cargo run -- --cli --yamori-config "$(CONFIG)"
+
+# TUIモードでテストを実行
+test-tui:
+	@if [ -z "$(CONFIG)" ]; then \
+		echo "Error: CONFIG variable not set"; \
+		echo "Usage: make test-tui CONFIG=<config_file>"; \
+		exit 1; \
+	fi
+	cargo run -- --yamori-config "$(CONFIG)"
 
 # クリーン
 clean:
 	cargo clean
-	(cd examples/monotonic_check && cargo clean)
-	(cd examples/even_counter && cargo clean)
-	(cd examples/max_finder && cargo clean)
+
+# ヘルプ
+help:
+	@echo "Available targets:"
+	@echo "  build         - Build the project (debug mode)"
+	@echo "  build-release - Build the project (release mode)"
+	@echo "  test          - Run tests (debug mode)"
+	@echo "  test-debug    - Run tests (debug mode)"
+	@echo "  test-release  - Run tests (release mode)"
+	@echo "  test-cli      - Run tests in CLI mode"
+	@echo "  test-tui      - Run tests in TUI mode"
+	@echo "  run-test      - Run a specific test"
+	@echo "  clean         - Clean build artifacts"
+	@echo "  help          - Show this help"
+	@echo ""
+	@echo "Examples:"
+	@echo "  make test CONFIG=tests/configs/tests.toml"
+	@echo "  make test-cli CONFIG=tests/configs/tests.yaml"
+	@echo "  make run-test TEST=\"Echo Test\" CONFIG=tests/configs/tests.toml"
 
 # 全てのサンプルプログラムをビルド（デバッグ）
 build-examples:

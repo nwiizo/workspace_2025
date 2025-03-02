@@ -2,37 +2,6 @@
 
 Yamori is a test runner and visualizer for command-line applications. It allows you to define tests in TOML or YAML format and visualize the results in a terminal UI or run them in CLI mode.
 
-## Quick Start
-
-```bash
-# Install
-cargo install --path .
-
-# Run in TUI mode
-yamori --yamori-config tests/configs/tests.toml
-
-# Run in CLI mode
-yamori --cli --yamori-config tests/configs/tests.toml
-```
-
-## Project Structure
-
-```
-yamori/
-├── src/                 # Source code
-├── docs/                # Documentation
-├── scripts/             # Helper scripts
-├── examples/            # Example applications
-└── tests/
-    └── configs/         # Test configuration files
-```
-
-## Documentation
-
-For detailed documentation, please see:
-- [Full Documentation](docs/README_full.md)
-- [Example Configurations](tests/configs/)
-
 ## Features
 
 - Define tests in TOML or YAML format
