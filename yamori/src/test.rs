@@ -73,12 +73,14 @@ pub fn load_config(config_path: &PathBuf) -> Result<TestConfig> {
     // 拡張子に応じて適切なパーサーを使用
     match extension.as_str() {
         "yaml" | "yml" => {
-            println!("Parsing YAML configuration from {}", config_path.display());
+            // コマンド出力を抑制
+            // println!("Parsing YAML configuration from {}", config_path.display());
             serde_yaml::from_str(&content)
                 .map_err(|e| anyhow::anyhow!("YAML parse error: {}", e))
         },
         "toml" => {
-            println!("Parsing TOML configuration from {}", config_path.display());
+            // コマンド出力を抑制
+            // println!("Parsing TOML configuration from {}", config_path.display());
             toml::from_str(&content)
                 .map_err(|e| anyhow::anyhow!("TOML parse error: {}", e))
         },
@@ -185,18 +187,23 @@ pub fn run_pre_build_commands(config: &TestConfig) -> Result<()> {
                 // テンプレート変数を処理
                 let cmd = process_template(cmd_template, build.release);
                 
-                println!("Running pre-build command: {}", cmd);
+                // コマンド出力を抑制
+                // println!("Running pre-build command: {}", cmd);
                 
                 // コマンドを実行
-                let status = Command::new("sh")
+                let output = Command::new("sh")
                     .arg("-c")
                     .arg(&cmd)
-                    .status()
+                    .output()
                     .with_context(|| format!("Failed to execute pre-build command: {}", cmd))?;
                 
-                if !status.success() {
+                if !output.status.success() {
                     return Err(anyhow::anyhow!("Pre-build command failed: {}", cmd));
                 }
+                
+                // コマンド出力を抑制
+                // let stdout = String::from_utf8_lossy(&output.stdout);
+                // println!("{}", stdout.trim());
             }
         }
     }
@@ -205,33 +212,8 @@ pub fn run_pre_build_commands(config: &TestConfig) -> Result<()> {
 }
 
 pub fn run_tests(config: &TestConfig) -> Result<Vec<TestResult>> {
-    // コマンド出力を抑制
-    // println!("Parsing {} configuration from {}", config.format, config.path.display());
-    
-    // Run global pre-build commands if any
-    if let Some(build) = &config.build {
-        for cmd in &build.pre_build_commands {
-            // コマンド出力を抑制
-            // println!("Running pre-build command: {}", cmd);
-            
-            let output = Command::new("sh")
-                .arg("-c")
-                .arg(cmd)
-                .output()
-                .with_context(|| format!("failed to execute pre-build command: {}", cmd))?;
-            
-            if !output.status.success() {
-                return Err(anyhow::anyhow!(
-                    "pre-build command failed: {}\n{}",
-                    cmd,
-                    String::from_utf8_lossy(&output.stderr)
-                ));
-            }
-            
-            // コマンド出力を抑制
-            // println!("{}", String::from_utf8_lossy(&output.stdout).trim());
-        }
-    }
+    // ビルド前のコマンドを実行
+    run_pre_build_commands(config)?;
     
     let mut results = Vec::new();
     let global_release = config.build.as_ref().map_or(false, |b| b.release);
@@ -240,32 +222,9 @@ pub fn run_tests(config: &TestConfig) -> Result<Vec<TestResult>> {
         // コマンド出力を抑制
         // println!("Running test: {}", test.name);
         
-        // Run test-specific pre-build commands if any
-        if let Some(pre_build) = &test.build {
-            for cmd in &pre_build.pre_build_commands {
-                // コマンド出力を抑制
-                // println!("Running pre-build command for test '{}': {}", test.name, cmd);
-                
-                let output = Command::new("sh")
-                    .arg("-c")
-                    .arg(cmd)
-                    .output()
-                    .with_context(|| {
-                        format!("failed to execute pre-build command for test '{}': {}", test.name, cmd)
-                    })?;
-                
-                if !output.status.success() {
-                    return Err(anyhow::anyhow!(
-                        "pre-build command for test '{}' failed: {}\n{}",
-                        test.name,
-                        cmd,
-                        String::from_utf8_lossy(&output.stderr)
-                    ));
-                }
-                
-                // コマンド出力を抑制
-                // println!("{}", String::from_utf8_lossy(&output.stdout).trim());
-            }
+        // テスト固有のビルド設定があれば実行
+        if let Some(build) = &test.build {
+            run_test_build_commands(test, build)?;
         }
         
         // テスト固有のリリースモード設定があればそれを使用、なければグローバル設定を使用
@@ -375,18 +334,23 @@ fn run_test_build_commands(test: &TestCase, build: &BuildConfig) -> Result<()> {
             // テンプレート変数を処理
             let cmd = process_template(cmd_template, build.release);
             
-            println!("Running pre-build command for test '{}': {}", test.name, cmd);
+            // コマンド出力を抑制
+            // println!("Running pre-build command for test '{}': {}", test.name, cmd);
             
             // コマンドを実行
-            let status = Command::new("sh")
+            let output = Command::new("sh")
                 .arg("-c")
                 .arg(&cmd)
-                .status()
+                .output()
                 .with_context(|| format!("Failed to execute pre-build command: {}", cmd))?;
             
-            if !status.success() {
+            if !output.status.success() {
                 return Err(anyhow::anyhow!("Pre-build command failed for test '{}': {}", test.name, cmd));
             }
+            
+            // コマンド出力を抑制
+            // let stdout = String::from_utf8_lossy(&output.stdout);
+            // println!("{}", stdout.trim());
         }
     }
     
