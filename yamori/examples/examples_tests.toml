@@ -1,0 +1,106 @@
+# yamori examples tests configuration
+
+# ビルド設定
+[build]
+# リリースビルドを使用するかどうか
+release = false
+# ビルド前に実行するコマンド（オプション）
+pre_build_commands = [
+    "echo 'Building example programs...'",
+    "cd examples/monotonic_check && cargo build {{#if release}}--release{{/if}}",
+    "cd examples/even_counter && cargo build {{#if release}}--release{{/if}}",
+    "cd examples/max_finder && cargo build {{#if release}}--release{{/if}}"
+]
+
+# 単調増加チェックのテスト
+[[tests]]
+name = "Monotonic Check - Strictly Increasing"
+command = "bash"
+args = ["-c", "cd examples/monotonic_check && ./target/{{#if build.release}}release{{else}}debug{{/if}}/monotonic_check"]
+input = """3
+1 2 5
+"""
+expected_output = "Yes"
+timeout_secs = 5
+
+[[tests]]
+name = "Monotonic Check - Not Strictly Increasing"
+command = "bash"
+args = ["-c", "cd examples/monotonic_check && ./target/{{#if build.release}}release{{else}}debug{{/if}}/monotonic_check"]
+input = """3
+3 9 5
+"""
+expected_output = "No"
+timeout_secs = 5
+
+[[tests]]
+name = "Monotonic Check - Equal Values"
+command = "bash"
+args = ["-c", "cd examples/monotonic_check && ./target/{{#if build.release}}release{{else}}debug{{/if}}/monotonic_check"]
+input = """4
+1 2 2 3
+"""
+expected_output = "No"
+timeout_secs = 5
+
+# 偶数カウンターのテスト
+[[tests]]
+name = "Even Counter - Some Even Numbers"
+command = "bash"
+args = ["-c", "cd examples/even_counter && ./target/{{#if build.release}}release{{else}}debug{{/if}}/even_counter"]
+input = """5
+1 2 3 4 5
+"""
+expected_output = "2"
+timeout_secs = 5
+
+[[tests]]
+name = "Even Counter - All Even Numbers"
+command = "bash"
+args = ["-c", "cd examples/even_counter && ./target/{{#if build.release}}release{{else}}debug{{/if}}/even_counter"]
+input = """3
+2 4 6
+"""
+expected_output = "3"
+timeout_secs = 5
+
+[[tests]]
+name = "Even Counter - No Even Numbers"
+command = "bash"
+args = ["-c", "cd examples/even_counter && ./target/{{#if build.release}}release{{else}}debug{{/if}}/even_counter"]
+input = """4
+1 3 5 7
+"""
+expected_output = "0"
+timeout_secs = 5
+
+# 最大値を求めるテスト
+[[tests]]
+name = "Max Finder - Positive Numbers"
+command = "bash"
+args = ["-c", "cd examples/max_finder && ./target/{{#if build.release}}release{{else}}debug{{/if}}/max_finder"]
+input = """5
+1 3 5 2 4
+"""
+expected_output = "5"
+timeout_secs = 5
+
+[[tests]]
+name = "Max Finder - Negative Numbers"
+command = "bash"
+args = ["-c", "cd examples/max_finder && ./target/{{#if build.release}}release{{else}}debug{{/if}}/max_finder"]
+input = """3
+-1 -5 -3
+"""
+expected_output = "-1"
+timeout_secs = 5
+
+[[tests]]
+name = "Max Finder - Mixed Numbers"
+command = "bash"
+args = ["-c", "cd examples/max_finder && ./target/{{#if build.release}}release{{else}}debug{{/if}}/max_finder"]
+input = """4
+-2 0 3 -1
+"""
+expected_output = "3"
+timeout_secs = 5 

@@ -1,0 +1,14 @@
+# tokage_tests.yaml
+tests:
+  - name: "Echo Test"
+    command: "echo"
+    args: ["Hello, World!"]
+    expected_output: "Hello, World!"
+    timeout_secs: 5
+
+  - name: "Word Count Test"
+    command: "wc"
+    args: ["-w"]
+    input: "This is a test sentence with exactly eight words."
+    expected_output: "8"
+    timeout_secs: 5 

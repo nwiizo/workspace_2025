@@ -1,0 +1,21 @@
+# tokage tests configuration for monotonic check code
+
+[[tests]]
+name = "Monotonic Check - Strictly Increasing"
+command = "cargo"
+args = ["run", "--quiet"]
+input = """3
+1 2 5
+"""
+expected_output = "Yes"
+timeout_secs = 5
+
+[[tests]]
+name = "Monotonic Check - Not Strictly Increasing"
+command = "cargo"
+args = ["run", "--quiet"]
+input = """3
+3 9 5
+"""
+expected_output = "No"
+timeout_secs = 5 
