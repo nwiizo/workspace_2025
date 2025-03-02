@@ -119,3 +119,33 @@
 - 20:00 - 21:00: Exercise (alternative time slot) 🏋️
 - 21:30 - 23:30: Reading (Second session) 📚
 - 23:30: Bedtime 😴
+
+### Workspace Structure 📂
+This workspace is organized into the following categories:
+
+1. **Competitive Programming** (`competitive_programming/`) 🏆
+   - Contains AtCoder and other competitive programming projects
+
+2. **Tools & Utilities** (`tools/`) 🔧
+   - Development tools and utility applications
+   - Includes Yamori, cargo-autodd, and other utility projects
+
+3. **Web Applications** (`web_apps/`) 🌐
+   - Web-based projects and applications
+   - Includes Yew applications and web frameworks
+
+4. **Infrastructure** (`infrastructure/`) ☁️
+   - Container, monitoring, and infrastructure-related projects
+   - Security testing and infrastructure automation
+
+5. **Sample Code** (`samples/`) 📝
+   - Code examples and learning projects
+   - Small demonstration applications
+
+6. **Events & Conferences** (`events/`) 🎪
+   - Projects related to tech events and conferences
+   - Presentation materials and workshop content
+
+7. **Documentation** (`docs/`) 📚
+   - Templates and general documentation
+   - Contributing guidelines and other documentation
