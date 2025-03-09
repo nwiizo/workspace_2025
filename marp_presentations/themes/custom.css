@@ -1,0 +1,53 @@
+/* カスタムテーマ for Marp */
+@import 'default';
+
+/* 全スライド共通のスタイル */
+section {
+  background: #f8f9fa;
+  font-family: 'Noto Sans JP', 'Helvetica Neue', Arial, sans-serif;
+  padding: 40px;
+}
+
+/* タイトルスライドのスタイル */
+section h1 {
+  color: #1a73e8;
+  font-size: 2.5em;
+}
+
+/* 見出しのスタイル */
+section h2 {
+  color: #174ea6;
+  border-bottom: 2px solid #dadce0;
+  padding-bottom: 0.2em;
+}
+
+/* リストのスタイル */
+section ul,
+section ol {
+  margin-left: 0.5em;
+}
+
+/* コードブロックのスタイル */
+section pre {
+  background: #f1f3f4;
+  border-radius: 4px;
+  padding: 0.5em;
+}
+
+/* 引用のスタイル */
+section blockquote {
+  border-left: 5px solid #dadce0;
+  margin-left: 0;
+  padding-left: 1em;
+  color: #5f6368;
+}
+
+/* フッター */
+section::after {
+  content: attr(data-marpit-pagination) ' / ' attr(data-marpit-pagination-total);
+  font-size: 0.6em;
+  color: #80868b;
+  position: absolute;
+  bottom: 15px;
+  right: 20px;
+} 

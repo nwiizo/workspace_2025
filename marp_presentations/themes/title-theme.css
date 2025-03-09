@@ -1,0 +1,51 @@
+/* タイトルスライド用カスタムテーマ */
+@import 'default';
+
+/* 全スライド共通のスタイル */
+section {
+  font-family: 'Noto Sans JP', 'Helvetica Neue', Arial, sans-serif;
+  padding: 40px;
+}
+
+/* タイトルスライドのスタイル */
+section h1 {
+  color: white;
+  font-size: 3em;
+  text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+section h3 {
+  color: white;
+  font-size: 1.5em;
+  margin-top: 0.5em;
+  text-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
+}
+
+/* 見出しのスタイル */
+section h2 {
+  color: #174ea6;
+  border-bottom: 2px solid #dadce0;
+  padding-bottom: 0.2em;
+}
+
+/* リストのスタイル */
+section ul,
+section ol {
+  margin-left: 0.5em;
+}
+
+/* フッター */
+section::after {
+  content: attr(data-marpit-pagination) ' / ' attr(data-marpit-pagination-total);
+  font-size: 0.6em;
+  color: #80868b;
+  position: absolute;
+  bottom: 15px;
+  right: 20px;
+}
+
+/* 最初と最後のスライドのフッターを非表示 */
+section:first-of-type::after,
+section:last-of-type::after {
+  display: none;
+} 

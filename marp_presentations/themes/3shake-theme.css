@@ -1,0 +1,89 @@
+/* 3-SHAKE用カスタムテーマ */
+@import 'default';
+
+/* 全スライド共通のスタイル */
+section {
+  font-family: 'Noto Sans JP', 'Helvetica Neue', Arial, sans-serif;
+  padding: 40px;
+}
+
+/* タイトルスライドのスタイル */
+section h1 {
+  color: white;
+  font-size: 3em;
+  text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+section h3 {
+  color: white;
+  font-size: 1.5em;
+  margin-top: 0.5em;
+  text-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
+}
+
+/* 見出しのスタイル */
+section h2 {
+  color: #174ea6; /* 青系の色 */
+  border-bottom: 2px solid #dadce0;
+  padding-bottom: 0.2em;
+}
+
+/* リストのスタイル */
+section ul,
+section ol {
+  margin-left: 0.5em;
+}
+
+/* コードブロックのスタイル */
+section pre {
+  background: #0a1929; /* 暗い青色の背景 */
+  border-radius: 4px;
+  padding: 0.5em;
+  color: #e6f0ff;
+}
+
+/* 引用のスタイル */
+section blockquote {
+  border-left: 5px solid #4dabf5; /* 青色のアクセント */
+  margin-left: 0;
+  padding-left: 1em;
+  color: #e6f0ff;
+}
+
+/* フッター */
+section::after {
+  content: attr(data-marpit-pagination) ' / ' attr(data-marpit-pagination-total);
+  font-size: 0.6em;
+  color: #80868b;
+  position: absolute;
+  bottom: 15px;
+  right: 20px;
+}
+
+/* 最初と最後のスライドのフッターを非表示 */
+section:first-of-type::after,
+section:last-of-type::after {
+  display: none;
+}
+
+/* 3-SHAKEカラースキーム */
+.highlight-yellow {
+  color: #ECBE30; /* 3-SHAKEの黄色 */
+}
+
+.highlight-green {
+  color: #5FB878; /* 3-SHAKEの緑色 */
+}
+
+.highlight-blue {
+  color: #4AADDD; /* 3-SHAKEの青色 */
+}
+
+/* 背景色付きのボックス */
+.info-box {
+  background-color: rgba(74, 173, 221, 0.1); /* 薄い青色 */
+  border-left: 4px solid #4AADDD;
+  padding: 1em;
+  margin: 1em 0;
+  border-radius: 2px;
+} 
