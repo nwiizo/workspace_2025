@@ -1,0 +1,8 @@
+[package]
+name = "sample_01"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+xcap = "0.5.0"
+opencv = { version = "0.94.4", features = ["clang-runtime"] }
