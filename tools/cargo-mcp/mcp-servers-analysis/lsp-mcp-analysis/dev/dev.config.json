@@ -1,0 +1,21 @@
+/* Comments are allowed in this config file, yay */
+{
+  "lsps": [
+    {
+      "id": "typescript", // unique id for logging purposes only
+      "extensions": ["ts", "tsx", "js", "jsx"], // helps identify which files to use this lsp for
+      "languages": ["typescript", "javascript"], // if the LLM sends one of these key words as the language, use this lsp
+      "command": "npx",
+      "args": ["-y", "typescript-language-server", "--stdio"]
+    },
+    {
+      "id": "python",
+      "extensions": ["py"],
+      "languages": ["python", "python2", "python3"],
+      "command": "uvx",
+      "args": ["--from", "python-lsp-server", "pylsp"]
+    }
+  ],
+  // optional filter for which LSP methods to support, defaults to all methods
+  "methods": ["textDocument/documentSymbol"]
+}
