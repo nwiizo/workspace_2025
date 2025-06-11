@@ -1,0 +1,67 @@
+{
+  "todos": [
+    {
+      "id": "092fca76-a020-4bf5-8f76-22cedb8d77b0",
+      "title": "TODO アプリの復活だい",
+      "description": null,
+      "completed": false,
+      "priority": "Medium",
+      "due_date": null,
+      "tags": [
+        "status:in-progress"
+      ],
+      "project_id": null,
+      "parent_id": null,
+      "position": 2,
+      "recurrence": null,
+      "created_at": "2025-06-04T06:17:06.874055Z",
+      "updated_at": "2025-06-04T09:10:49.519203Z"
+    },
+    {
+      "id": "d912b1dd-7671-46f0-a879-8a895bd48265",
+      "title": "New Pending Task",
+      "description": null,
+      "completed": false,
+      "priority": "Low",
+      "due_date": null,
+      "tags": [],
+      "project_id": null,
+      "parent_id": null,
+      "position": 4,
+      "recurrence": null,
+      "created_at": "2025-06-05T00:44:46.546137Z",
+      "updated_at": "2025-06-05T00:49:13.839559Z"
+    },
+    {
+      "id": "fb5f4779-dcdf-4ce3-9462-af6d78b04786",
+      "title": "Test In Progress Task",
+      "description": null,
+      "completed": false,
+      "priority": "Medium",
+      "due_date": null,
+      "tags": [],
+      "project_id": null,
+      "parent_id": null,
+      "position": 3,
+      "recurrence": null,
+      "created_at": "2025-06-04T09:56:34.174691Z",
+      "updated_at": "2025-06-05T00:49:29.939567Z"
+    },
+    {
+      "id": "7bf28a86-a3c3-4976-8e23-31209eafad4b",
+      "title": "Test Todo",
+      "description": null,
+      "completed": false,
+      "priority": "High",
+      "due_date": null,
+      "tags": [],
+      "project_id": null,
+      "parent_id": null,
+      "position": 1,
+      "recurrence": null,
+      "created_at": "2025-06-04T05:35:23.912025Z",
+      "updated_at": "2025-06-05T00:49:19.161837Z"
+    }
+  ],
+  "projects": []
+}
