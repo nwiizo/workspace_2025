@@ -1,0 +1,11 @@
+*
+!README.md
+!lua/
+!lua/**
+!plugin/
+!plugin/**
+!doc/
+!doc/**
+!test_marp.md
+!LICENSE
+!.gitignore
