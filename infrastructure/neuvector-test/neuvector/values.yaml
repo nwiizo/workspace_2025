@@ -1,0 +1,20 @@
+# neuvector/values.yaml
+manager:
+  enabled: true
+  env:
+    ssl: true
+  svc:
+    type: NodePort
+    port: 10443
+
+controller:
+  replicas: 1
+
+enforcer:
+  enabled: true
+
+crd:
+  enabled: true
+
+containerd:
+  enabled: true

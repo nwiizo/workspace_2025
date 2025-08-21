@@ -1,0 +1,21 @@
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.10s
+     Running `target/debug/basic_process`
+=== 基本的なプロセス操作のデモ ===
+
+1. シンプルなコマンド実行:
+  stdout: Hello from Rust!
+
+  stderr: 
+  status: exit status: 0
+
+2. パイプを使った入出力制御:
+  受信したデータ: Hello, Rust Process!
+This is line 2
+  子プロセスの終了ステータス: exit status: 0
+
+3. 環境変数とワーキングディレクトリの設定:
+  MY_VAR=Hello from Rust
+現在のディレクトリ: /private/tmp
+
+4. Unix固有の機能:
+  Unix specific features demo

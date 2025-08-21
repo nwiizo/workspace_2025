@@ -1,0 +1,43 @@
+warning: variant `ExecutionFailed` is never constructed
+  --> src/examples/secure_spawn.rs:14:5
+   |
+6  | enum ProcessError {
+   |      ------------ variant in this enum
+...
+14 |     ExecutionFailed,
+   |     ^^^^^^^^^^^^^^^
+   |
+   = note: `ProcessError` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+   = note: `#[warn(dead_code)]` on by default
+
+warning: `linux-process-rs` (bin "secure_spawn") generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.09s
+     Running `target/debug/secure_spawn`
+=== セキュアなプロセス起動のデモ ===
+
+1. 入力検証とサニタイゼーション:
+  入力: 'normal_file.txt'
+    ✓ 安全な入力: 'normal_file.txt'
+  入力: '../../../etc/passwd'
+    ✗ 拒否: Invalid input: パストラバーサルの可能性があります
+  入力: 'file.txt; rm -rf /'
+    ✗ 拒否: Invalid input: 危険な文字 ';' が含まれています
+  入力: '$(whoami)'
+    ✗ 拒否: Invalid input: 危険な文字 '$' が含まれています
+  入力: '`id`'
+    ✗ 拒否: Invalid input: 危険な文字 '`' が含まれています
+
+2. 権限を落としてプロセスを実行:
+  現在のUID/GIDで実行後、権限を落とす例:
+    通常実行: uid=501(nwiizo) gid=20(staff) groups=20(staff),12(everyone),61(localaccounts),79(_appserverusr),80(admin),81(_appserveradm),98(_lpadmin),101(access_bpf),33(_appstore),100(_lpoperator),204(_developer),250(_analyticsusers),395(com.apple.access_ftp),398(com.apple.access_screensharing),399(com.apple.access_ssh),400(com.apple.access_remote_ae)
+    権限設定後: uid=501(nwiizo) gid=20(staff) groups=20(staff),12(everyone),61(localaccounts),79(_appserverusr),80(admin),81(_appserveradm),98(_lpadmin),101(access_bpf),33(_appstore),100(_lpoperator),204(_developer),250(_analyticsusers),395(com.apple.access_ftp),398(com.apple.access_screensharing),399(com.apple.access_ssh),400(com.apple.access_remote_ae)
+
+3. 環境変数のクリーンアップ:
+  クリーンな環境での実行結果:
+PATH=/usr/bin:/bin
+    HOME=/tmp
+    USER=
+
+4. リソース制限の設定:
+  リソース制限を設定してプロセスを実行:
+Error: SpawnError(Os { code: 22, kind: InvalidInput, message: "Invalid argument" })

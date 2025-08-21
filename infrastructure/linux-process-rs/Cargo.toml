@@ -1,0 +1,119 @@
+[package]
+name = "linux-process-rs"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.70"  # MSRV（Tokioの要件に合わせる）
+
+[dependencies]
+# 標準ライブラリ拡張
+nix = { version = "0.27", features = ["signal", "process", "user", "mount", "sched", "resource", "fs"] }
+libc = "0.2"
+
+# 非同期処理
+tokio = { version = "1", features = ["full"] }  # 最新の1.x系を使用
+
+# プロセス管理
+signal-hook = "0.3"  # 0.3系が最新
+
+# エラーハンドリング
+thiserror = "1.0"
+anyhow = "1.0"
+
+# ターミナル操作（オプション）
+crossterm = { version = "0.28", optional = true }
+
+# トレーシング（推奨）
+tracing = { version = "0.1", optional = true }
+tracing-subscriber = { version = "0.3", optional = true }
+
+[[bin]]
+name = "basic_process"
+path = "src/examples/basic_process.rs"
+
+[[bin]]
+name = "fork_exec"
+path = "src/examples/fork_exec.rs"
+
+[[bin]]
+name = "signal_handling"
+path = "src/examples/signal_handling.rs"
+
+[[bin]]
+name = "zombie_prevention"
+path = "src/examples/zombie_prevention.rs"
+
+[[bin]]
+name = "async_process"
+path = "src/examples/async_process.rs"
+
+[[bin]]
+name = "process_group"
+path = "src/examples/process_group.rs"
+
+[[bin]]
+name = "secure_spawn"
+path = "src/examples/secure_spawn.rs"
+
+[[bin]]
+name = "nix_fork_basic"
+path = "src/examples/nix_fork_basic.rs"
+
+[[bin]]
+name = "nix_multi_worker"
+path = "src/examples/nix_multi_worker.rs"
+
+[[bin]]
+name = "nix_fork_exec"
+path = "src/examples/nix_fork_exec.rs"
+
+[[bin]]
+name = "nix_signal_handler"
+path = "src/examples/nix_signal_handler.rs"
+
+[[bin]]
+name = "nix_daemon"
+path = "src/examples/nix_daemon.rs"
+
+[[bin]]
+name = "article_simple_command"
+path = "src/examples/article_simple_command.rs"
+
+[[bin]]
+name = "article_pipe_communication"
+path = "src/examples/article_pipe_communication.rs"
+
+[[bin]]
+name = "article_signal_control"
+path = "src/examples/article_signal_control.rs"
+
+[[bin]]
+name = "article_process_group"
+path = "src/examples/article_process_group.rs"
+
+[[bin]]
+name = "article_demo"
+path = "src/examples/article_demo.rs"
+
+[dev-dependencies]
+criterion = "0.5"
+proptest = "1.5"
+tempfile = "3.12"
+
+[features]
+default = []
+terminal = ["crossterm"]
+debug = ["tracing", "tracing-subscriber"]
+
+# パフォーマンス最適化
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+strip = true  # バイナリサイズ削減
+
+[profile.bench]
+inherits = "release"
+
+[[bench]]
+name = "process_bench"
+harness = false

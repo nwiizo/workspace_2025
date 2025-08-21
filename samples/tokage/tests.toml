@@ -1,0 +1,37 @@
+# tokage tests configuration
+[[tests]]
+name = "Echo Test"
+command = "echo"
+args = ["Hello, World!"]
+expected_output = "Hello, World!"
+timeout_secs = 5
+
+[[tests]]
+name = "Word Count Test"
+command = "wc"
+args = ["-w"]
+input = "This is a test sentence with exactly eight words."
+expected_output = "8"
+timeout_secs = 5
+
+# tokage tests configuration for monotonic check code
+
+[[tests]]
+name = "Monotonic Check - Strictly Increasing"
+command = "cargo"
+args = ["run", "--quiet"]
+input = """3
+1 2 5
+"""
+expected_output = "Yes"
+timeout_secs = 5
+
+[[tests]]
+name = "Monotonic Check - Not Strictly Increasing"
+command = "cargo"
+args = ["run", "--quiet"]
+input = """3
+3 9 5
+"""
+expected_output = "No"
+timeout_secs = 5 

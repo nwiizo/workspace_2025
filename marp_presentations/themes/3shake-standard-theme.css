@@ -1,0 +1,162 @@
+/* 3-SHAKE標準スライド用テーマ */
+@import 'default';
+
+:root {
+  --3shake-blue: #2997c7;
+  --3shake-yellow: #f0c43c;
+  --3shake-green: #5FB878;
+  --3shake-dark-blue: #0a1929;
+  --text-dark: #333333;
+  --text-light: #ffffff;
+  --logo-url: url("../assets/images/3shake-logo.png");
+}
+
+section {
+  font-family: 'Noto Sans JP', 'Helvetica Neue', Arial, sans-serif;
+  color: var(--text-dark);
+  background-color: white;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+/* ロゴをすべてのスライドに自動的に表示 */
+section::before {
+  content: "";
+  position: absolute;
+  left: 50px;
+  bottom: 30px;
+  width: 30px;
+  height: 30px;
+  background-image: var(--logo-url);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  opacity: 0.9;
+  z-index: 100;
+}
+
+/* スライドタイトル */
+section h1 {
+  background-color: var(--3shake-blue);
+  color: var(--text-light);
+  margin: 0;
+  padding: 40px 50px 25px;
+  font-size: 2.2em;
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* タイトル下の黄色いライン */
+section h1::after {
+  content: "";
+  display: block;
+  background-color: var(--3shake-yellow);
+  height: 6px;
+  width: 100%;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+}
+
+/* コンテンツエリア */
+section > *:not(h1):not(header):not(footer) {
+  margin-left: 50px;
+  margin-right: 50px;
+}
+
+/* 箇条書きスタイル */
+section ul {
+  list-style-type: disc;
+  padding-left: 1.2em;
+}
+
+section ul li {
+  margin-bottom: 0.5em;
+}
+
+section ul ul {
+  list-style-type: circle;
+}
+
+section ul ul ul {
+  list-style-type: square;
+}
+
+section ul ul ul ul {
+  list-style-type: none;
+}
+
+section ul ul ul ul li::before {
+  content: "- ";
+}
+
+section ul ul ul ul ul li::before {
+  content: "• ";
+  font-size: 0.8em;
+}
+
+/* フッタースタイル */
+section::after {
+  content: attr(data-marpit-pagination);
+  font-size: 1.2em;
+  font-weight: bold;
+  color: var(--text-dark);
+  position: absolute;
+  right: 50px;
+  bottom: 30px;
+}
+
+/* 以下は不要になるが、後方互換性のために残しておく */
+.logo-container {
+  display: none; /* 手動で追加したロゴコンテナを非表示にする */
+}
+
+.logo {
+  width: 30px;
+  height: auto;
+  opacity: 0.9;
+  vertical-align: middle;
+}
+
+/* 特殊なスタイル */
+.highlight-blue {
+  color: var(--3shake-blue);
+}
+
+.highlight-yellow {
+  color: var(--3shake-yellow);
+}
+
+.highlight-green {
+  color: var(--3shake-green);
+}
+
+/* テーブルスタイル */
+section table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 20px 0;
+}
+
+section th {
+  background-color: var(--3shake-blue);
+  color: var(--text-light);
+  padding: 10px;
+  text-align: left;
+}
+
+section td {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+/* インフォボックス */
+.info-box {
+  background-color: rgba(41, 151, 199, 0.1);
+  border-left: 4px solid var(--3shake-blue);
+  padding: 15px;
+  margin: 15px 0;
+} 

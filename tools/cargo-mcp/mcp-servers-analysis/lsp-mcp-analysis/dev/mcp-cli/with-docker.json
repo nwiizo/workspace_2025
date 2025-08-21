@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "lsp": {
+      "command": "sh",
+      "args": ["-c", "docker run -i --rm -v $(pwd):$(pwd) jonrad/lsp-mcp"]
+    }
+  }
+}

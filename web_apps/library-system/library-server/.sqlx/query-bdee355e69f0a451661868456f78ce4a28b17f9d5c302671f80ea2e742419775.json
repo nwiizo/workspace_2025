@@ -1,0 +1,44 @@
+{
+  "db_name": "SQLite",
+  "query": "\n            SELECT id, title, author, isbn, available \n            FROM books \n            WHERE title LIKE ? OR author LIKE ? OR isbn LIKE ?\n            LIMIT ? OFFSET ?\n            ",
+  "describe": {
+    "columns": [
+      {
+        "name": "id",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "title",
+        "ordinal": 1,
+        "type_info": "Text"
+      },
+      {
+        "name": "author",
+        "ordinal": 2,
+        "type_info": "Text"
+      },
+      {
+        "name": "isbn",
+        "ordinal": 3,
+        "type_info": "Text"
+      },
+      {
+        "name": "available",
+        "ordinal": 4,
+        "type_info": "Bool"
+      }
+    ],
+    "parameters": {
+      "Right": 5
+    },
+    "nullable": [
+      true,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "bdee355e69f0a451661868456f78ce4a28b17f9d5c302671f80ea2e742419775"
+}

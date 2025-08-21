@@ -1,0 +1,21 @@
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.07s
+     Running `target/debug/signal_handling`
+=== シグナル処理のデモ ===
+
+1. シグナルハンドラの設定:
+  シグナルハンドラを設定しました
+  5秒間待機中... (Ctrl+Cで中断可能)
+  作業中... 1/5
+  作業中... 2/5
+  作業中... 3/5
+  作業中... 4/5
+  作業中... 5/5
+  正常終了
+
+2. 子プロセスへのシグナル送信:
+  10秒間スリープする子プロセスを起動...
+  子プロセスPID: 76755
+  2秒後にSIGTERMを送信します...
+  SIGTERMを送信
+  子プロセスの終了ステータス: ExitStatus(unix_wait_status(15))
+  子プロセスはシグナル 15 により終了しました

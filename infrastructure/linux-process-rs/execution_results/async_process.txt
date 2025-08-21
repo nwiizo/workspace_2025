@@ -1,0 +1,43 @@
+warning: function `parallel_backup_example` is never used
+   --> src/examples/async_process.rs:146:10
+    |
+146 | async fn parallel_backup_example(sources: Vec<String>) -> Result<(), Box<dyn std::error::Error>> {
+    |          ^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` on by default
+
+warning: `linux-process-rs` (bin "async_process") generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.08s
+     Running `target/debug/async_process`
+=== 非同期プロセス管理のデモ (Tokio) ===
+
+1. 基本的な非同期コマンド実行:
+  出力: Hello from async Rust!
+
+  ステータス: exit status: 0
+
+2. ストリーミング出力の処理:
+  ストリーミング出力:
+    >>> Line 1
+    >>> Line 2
+    >>> Line 3
+    >>> Line 4
+    >>> Line 5
+  プロセス終了: exit status: 0
+
+3. 複数プロセスの並行実行:
+  5つのプロセスを並行実行:
+    Task 4: Task 4 completed after 0.5s
+    Task 3: Task 3 completed after 1s
+    Task 2: Task 2 completed after 1.5s
+    Task 1: Task 1 completed after 2s
+    Task 0: Task 0 completed after 2.5s
+
+4. タイムアウト処理:
+  10秒のsleepコマンドを5秒でタイムアウト:
+    タイムアウト！プロセスを強制終了...
+    プロセスを強制終了しました
+
+5. パイプラインの構築:
+  パイプライン: echo | grep | wc -l
+    'line'を含む行数: 3

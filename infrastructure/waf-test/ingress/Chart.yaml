@@ -1,0 +1,9 @@
+# Chart.yaml
+apiVersion: v2
+name: custom-ingress
+version: 1.0.0
+dependencies:
+  - name: ingress-nginx
+    version: "*"
+    repository: https://kubernetes.github.io/ingress-nginx
+    condition: ingress-nginx.enabled

@@ -1,0 +1,26 @@
+# yamori tests configuration
+[[tests]]
+name = "Echo Test"
+command = "echo"
+args = ["Hello, World!"]
+expected_output = "Hello, World!"
+timeout_secs = 5
+[tests.build]
+release = false
+pre_build_commands = ["echo 'Preparing Echo Test'"]
+
+[[tests]]
+name = "Word Count Test"
+command = "wc"
+args = ["-w"]
+input = "This is a test sentence with exactly eight words."
+expected_output = "8"
+timeout_secs = 5
+[tests.build]
+release = true
+pre_build_commands = ["echo 'Preparing Word Count Test'", "echo 'Running in release mode'"]
+
+# Global build configuration (used as fallback if test doesn't specify its own)
+[build]
+release = false
+pre_build_commands = ["echo 'Global build preparation'"] 

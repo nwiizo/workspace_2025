@@ -1,0 +1,28 @@
+# https://artifacthub.io/packages/helm/ingress-nginx/ingress-nginx
+# helm install ingress-nginx . --namespace ingress-nginx --values values.yaml
+# ingress/values.yaml
+ingress-nginx:
+  enabled: true
+  controller:
+    config:
+      enable-modsecurity: "true"
+      enable-owasp-modsecurity-crs: "true"
+      modsecurity-snippet: |
+        Include /etc/nginx/owasp-modsecurity-crs/custom/custom-modsecurity.conf
+
+    extraVolumeMounts:
+      - name: modsecurity-config
+        mountPath: /etc/nginx/owasp-modsecurity-crs/custom/
+
+    extraVolumes:
+      - name: modsecurity-config
+        configMap:
+          name: modsecurity-config
+
+    podTemplate:
+      spec:
+        containers:
+          - name: controller
+            args:
+              - /nginx-ingress-controller
+              - --enable-modsecurity=true

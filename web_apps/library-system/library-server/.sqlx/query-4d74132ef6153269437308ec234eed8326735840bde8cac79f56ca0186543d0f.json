@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT available FROM books WHERE id = ?",
+  "describe": {
+    "columns": [
+      {
+        "name": "available",
+        "ordinal": 0,
+        "type_info": "Bool"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "4d74132ef6153269437308ec234eed8326735840bde8cac79f56ca0186543d0f"
+}

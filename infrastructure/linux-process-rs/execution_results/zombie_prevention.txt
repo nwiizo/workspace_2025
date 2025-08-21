@@ -1,0 +1,80 @@
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.10s
+     Running `target/debug/zombie_prevention`
+=== ゾンビプロセス対策のデモ ===
+
+1. ゾンビプロセスの発生例（悪い例）:
+  子プロセスを生成してすぐに終了させます（wait()しない）
+  親: 子プロセス 77132 を生成
+  親: wait()せずに3秒間スリープ...
+  親: この間、子プロセスはゾンビ状態になります
+  子: すぐに終了します
+
+  現在のプロセス状態:
+USER               PID  %CPU %MEM      VSZ    RSS   TT  STAT STARTED      TIME COMMAND
+nwiizo           77134  78.1  1.4 412240400 232704 s004  R+    8:18PM   0:00.46 npm install @anthropic-ai/claude-code    
+nwiizo           77135  13.9  0.1 426969152  14032   ??  S     8:18PM   0:00.05 /System/Library/Frameworks/CoreServices.framework/Frameworks/Metadata.framework/Versions/A/Support/mdworker_shared -s mdworker -c MDSImporterWorker -m com.apple.mdworker.shared
+nwiizo           59506  10.5  1.0 1865622512 164032   ??  S    Mon02PM   7:13.63 /Applications/Arc.app/Contents/Frameworks/ArcCore.framework/Helpers/Browser Helper (Renderer).app/Contents/MacOS/Browser Helper (Renderer) --type=renderer --enable-dinosaur-easter-egg-alt-images --user-data-dir=/Users/nwiizo/Library/Application Support/Arc/User Data --bcny-app-id=0 --enable-blink-features=MediaSessionEnterPictureInPictureOnGMeetOnly --lang=ja --num-raster-threads=4 --enable-zero-copy --enable-gpu-memory-buffer-compositor-resources --enable-main-frame-before-activation --renderer-client-id=4763 --time-ticks-at-unix-epoch=-1755038952525059 --launch-time-ticks=415213399633 --shared-files --metrics-shmem-handle=1752395122,r,4105147703870536475,2608748709238364712,2097152 --field-trial-handle=1718379636,r,8591501679424107338,11219274092750747027,262144 --variations-seed-version --seatbelt-client=566
+root               562   8.1  0.1 426961392  10544   ??  Ss    7Aug25   8:35.41 /System/Library/CoreServices/launchservicesd
+nwiizo           71566   6.7  1.0 438007136 163408 s004  S+    7:47PM   3:00.90 claude   
+_windowserver      600   5.7  0.6 414602448  96672   ??  Ss    7Aug25 672:56.63 /System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon
+nwiizo           39282   5.5  0.7 416117088 124784   ??  S    Sun02PM   5:27.92 /Applications/Warp.app/Contents/MacOS/stable
+root               835   5.1  1.3 442346608 216064   ??  Ss    7Aug25 310:03.72 /System/Library/Frameworks/CoreServices.framework/Frameworks/Metadata.framework/Versions/A/Support/mds_stores
+root             71677   5.0  0.2 426952256  33920   ??  Ss    7:47PM   0:08.69 /System/Library/PrivateFrameworks/XprotectFramework.framework/Versions/A/XPCServices/XprotectService.xpc/Contents/MacOS/XprotectService
+nwiizo             592   4.6  0.2 412340912  28752   ??  Ss    7Aug25   8:05.48 /System/Library/CoreServices/loginwindow.app/Contents/MacOS/loginwindow console
+nwiizo           76254   4.5  1.3 438009728 217328 s005  S+    8:13PM   0:29.72 claude    
+_coreaudiod        605   3.7  0.1 426986192  11904   ??  Ss    7Aug25 179:43.99 /usr/sbin/coreaudiod
+nwiizo            1717   3.0  0.2 412924064  41152   ??  S     7Aug25 178:15.95 /Applications/Be Focused Pro.app/Contents/MacOS/Be Focused Pro
+nwiizo           76453   2.9  0.2 426969152  26560   ??  S     8:15PM   0:00.19 /System/Library/Frameworks/CoreServices.framework/Frameworks/Metadata.framework/Versions/A/Support/mdworker_shared -s mdworker -c MDSImporterWorker -m com.apple.mdworker.shared
+nwiizo           39235   2.5  4.0 446671776 678672   ??  S    Sun02PM  80:15.15 /Applications/Arc.app/Contents/MacOS/Arc
+nwiizo           77118   1.9  0.1 426969152  24144   ??  S     8:17PM   0:00.10 /System/Library/Frameworks/CoreServices.framework/Frameworks/Metadata.framework/Versions/A/Support/mdworker_shared -s mdworker -c MDSImporterWorker -m com.apple.mdworker.shared
+root               593   1.8  0.1 426964864  12432   ??  Ss    7Aug25  41:08.85 /usr/libexec/runningboardd
+nwiizo            5833   1.6  0.5 416602768  91472   ??  S     7Aug25 250:32.47 /Applications/zoom.us.app/Contents/MacOS/zoom.us
+nwiizo           39237   1.4  0.5 445349280  84368   ??  S    Sun02PM  34:42.73 /Applications/Arc.app/Contents/Frameworks/ArcCore.framework/Helpers/Browser Helper (GPU).app/Contents/MacOS/Browser Helper (GPU) --type=gpu-process --user-data-dir=/Users/nwiizo/Library/Application Support/Arc/User Data --bcny-app-id=0 --gpu-preferences=SAAAAAAAAAAgAAAIAAAAAAAAAAAAAGAAAQAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAABAAAAAAAAAACAAAAAAAAAAIAAAAAAAAAA== --shared-files --metrics-shmem-handle=1752395122,r,14960297861600911937,9485344159518279752,262144 --field-trial-handle=1718379636,r,8591501679424107338,11219274092750747027,262144 --variations-seed-version --seatbelt-client=18
+root               547   1.2  0.1 427036880  19344   ??  Ss    7Aug25 100:54.13 /System/Library/Frameworks/CoreServices.framework/Frameworks/Metadata.framework/Support/mds
+nwiizo           62277   1.2  0.7 1867687568 114816   ??  S    Mon04PM  11:26.63 /Applications/Arc.app/Contents/Frameworks/ArcCore.framework/Helpers/Browser Helper (Renderer).app/Contents/MacOS/Browser Helper (Renderer) --type=renderer --enable-dinosaur-easter-egg-alt-images --user-data-dir=/Users/nwiizo/Library/Application Support/Arc/User Data --bcny-app-id=0 --enable-blink-features=MediaSessionEnterPictureInPictureOnGMeetOnly --lang=ja --num-raster-threads=4 --enable-zero-copy --enable-gpu-memory-buffer-compositor-resources --enable-main-frame-before-activation --renderer-client-id=5418 --time-ticks-at-unix-epoch=-1755038952525059 --launch-time-ticks=420884014045 --shared-files --metrics-shmem-handle=1752395122,r,16736789941403498978,13967725771541827526,2097152 --field-trial-handle=1718379636,r,8591501679424107338,11219274092750747027,262144 --variations-seed-version --seatbelt-client=601
+nwiizo            1316   1.0  0.2 412200464  35744   ??  S     7Aug25   9:41.49 /System/Library/CoreServices/Finder.app/Contents/MacOS/Finder
+root                 1   0.8  0.1 426853152  10928   ??  Ss    7Aug25  60:19.40 /sbin/launchd
+root               698   0.8  0.1 427053152  15472   ??  Ss    7Aug25  14:25.14 /usr/libexec/syspolicyd
+nwiizo             949   0.6  0.0 426920112   4976   ??  S     7Aug25   7:20.41 /usr/sbin/cfprefsd agent
+nwiizo           42419   0.6  0.3 417858464  46000   ??  S    Sun04PM   6:28.06 /Applications/Amazon Kindle.app/Contents/MacOS/Kindle
+nwiizo           77130   0.6  0.0 410601936   1552   ??  S     8:18PM   0:00.07 target/debug/zombie_prevention
+nwiizo            1461   0.5  0.4 1868787888  71600   ??  S     7Aug25  33:36.06 /Applications/Notion.app/Contents/Frameworks/Notion Helper (Renderer).app/Contents/MacOS/Notion Helper (Renderer) --type=renderer --user-data-dir=/Users/nwiizo/Library/Application Support/Notion --app-path=/Applications/Notion.app/Contents/Resources/app.asar --enable-sandbox --lang=ja --num-raster-threads=4 --enable-zero-copy --enable-gpu-memory-buffer-compositor-resources --enable-main-frame-before-activation --renderer-client-id=9 --time-ticks-at-unix-epoch=-1754508651134404 --launch-time-ticks=147138351 --shared-files --field-trial-handle=1718379636,r,12558596013065746848,5599429258578409934,262144 --enable-features=DocumentPolicyIncludeJSCallStacksInCrashReports,MacLoopbackAudioForScreenShare,PdfUseShowSaveFilePicker,ScreenCaptureKitPickerScreen,ScreenCaptureKitStreamPickerSonoma --disable-features=MacWebContentsOcclusion,SpareRendererForSitePerProcess,TimeoutHangingVideoCaptureStarts --variations-seed-version --seatbelt-client=79
+root               523   0.5  0.0 426925008   5680   ??  Ss    7Aug25  22:28.59 /System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/FSEvents.framework/Versions/A/Support/fseventsd
+nwiizo            1297   0.5  0.8 1866018320 129136   ??  S     7Aug25  85:53.77 /Applications/Notion.app/Contents/MacOS/Notion
+root               583   0.4  0.0 426916336   3344   ??  Ss    7Aug25   6:45.27 /usr/sbin/notifyd
+root             49074   0.4  0.1 426968800  14304   ??  Ss   Mon01AM   2:48.50 /usr/libexec/PerfPowerServices
+nwiizo            5872   0.4  0.1 410839568  21968   ??  S     7Aug25  91:57.87 /Applications/zoom.us.app/Contents/Frameworks/ZoomClips.app/Contents/MacOS/ZoomClips --runasps=TRUE --parentbundlename=zoom.us --action=preload --ClipsRecordingType=Unknown
+root               559   0.4  0.0 426956672   8128   ??  Ss    7Aug25  11:41.85 /usr/libexec/opendirectoryd
+nwiizo            1729   0.3  0.1 35898732  14548   ??  S     7Aug25   6:11.91 /Applications/Clipy.app/Contents/MacOS/Clipy
+nwiizo            1449   0.3  0.3 1865130976  50944   ??  S     7Aug25  31:15.26 /Applications/Notion.app/Contents/Frameworks/Notion Helper.app/Contents/MacOS/Notion Helper --type=utility --utility-sub-type=node.mojom.NodeService --lang=ja --service-sandbox-type=none --user-data-dir=/Users/nwiizo/Library/Application Support/Notion --shared-files --field-trial-handle=1718379636,r,12558596013065746848,5599429258578409934,262144 --enable-features=DocumentPolicyIncludeJSCallStacksInCrashReports,MacLoopbackAudioForScreenShare,PdfUseShowSaveFilePicker,ScreenCaptureKitPickerScreen,ScreenCaptureKitStreamPickerSonoma --disable-features=MacWebContentsOcclusion,SpareRendererForSitePerProcess,TimeoutHangingVideoCaptureStarts --variations-seed-version
+root               519   0.3  0.1 427066912  11120   ??  Ss    7Aug25  28:02.00 /usr/libexec/logd
+nwiizo            9130   0.3  0.1 35348616   8452   ??  S     7Aug25  11:41.59 /Library/Input Methods/GoogleJapaneseInput.app/Contents/Resources/GoogleJapaneseInputRenderer.app/Contents/MacOS/GoogleJapaneseInputRenderer
+root               591   0.3  0.0 426918128   4448   ??  Ss    7Aug25   5:34.15 /usr/sbin/cfprefsd daemon
+root               582   0.2  0.1 426975904  17872   ??  Ss    7Aug25  37:54.37 /usr/sbin/bluetoothd
+_driverkit         715   0.2  0.2 426918992  36320   ??  Ss    7Aug25  74:04.24 /System/Library/DriverExtensions/com.apple.DriverKit-AppleBCMWLAN.dext/com.apple.DriverKit-AppleBCMWLAN com.apple.bcmwlan 0x100000cb7 com.apple.DriverKit-AppleBCMWLAN
+root              1357   0.2  0.1 426963376   9632   ??  Ss    7Aug25   7:25.75 /usr/libexec/gamepolicyd
+_trustd            604   0.2  0.1 426957216   9376   ??  Ss    7Aug25  12:27.53 /usr/libexec/trustd
+nwiizo           68858   0.2  0.1 427111184  18752   ??  S     6:53PM   0:00.38 /System/Library/PrivateFrameworks/SoftwareUpdate.framework/Resources/SoftwareUpdateNotificationManager.app/Contents/MacOS/SoftwareUpdateNotificationManager
+nwiizo            1062   0.2  0.1 427370864  16208   ??  S     7Aug25   8:53.75 /usr/libexec/sharingd
+nwiizo           14085   0.2  0.6 445927184  99648   ??  S    Sat12PM  49:40.43 /Applications/Dia.app/Contents/MacOS/Dia
+nwiizo           62442   0.2  1.2 1867111072 199408   ??  S    Mon04PM   3:04.01 /Applications/Notion.app/Contents/Frameworks/Notion Helper (Renderer).app/Contents/MacOS/Notion Helper (Renderer) --type=renderer --user-data-dir=/Users/nwiizo/Library/Application Support/Notion --app-path=/Applications/Notion.app/Contents/Resources/app.asar --enable-sandbox --lang=ja --num-raster-threads=4 --enable-zero-copy --enable-gpu-memory-buffer-compositor-resources --enable-main-frame-before-activation --renderer-client-id=40 --time-ticks-at-unix-epoch=-1754508651134404 --launch-time-ticks=421313458423 --shared-files --field-trial-handle=1718379636,r,12558596013065746848,5599429258578409934,262144 --enable-features=DocumentPolicyIncludeJSCallStacksInCrashReports,MacLoopbackAudioForScreenShare,PdfUseShowSaveFilePicker,ScreenCaptureKitPickerScreen,ScreenCaptureKitStreamPickerSonoma --disable-features=MacWebContentsOcclusion,SpareRendererForSitePerProcess,TimeoutHangingVideoCaptureStarts --variations-seed-version --seatbelt-client=110
+nwiizo            1759   0.2  0.1 411859760  17792   ??  S     7Aug25  30:27.26 /Applications/Magnet.app/Contents/MacOS/Magnet
+nwiizo            1525   0.2  0.0 426952672   7728   ??  S     7Aug25   0:15.92 /System/Library/CoreServices/diagnostics_agent
+nwiizo            1346   0.2  0.1 35526304   8596   ??  S     7Aug25   6:32.20 /Library/Input Methods/GoogleJapaneseInput.app/Contents/MacOS/GoogleJapaneseInput
+nwiizo            1329   0.1  0.0 410551040   7984   ??  Ss    7Aug25   0:10.56 /Library/Sentinel/sentinel-agent.bundle/Contents/MacOS/sentinel_helper.app/Contents/PlugIns/On-Demand Scan.appex/Contents/MacOS/On-Demand Scan -AppleLanguages ("ja-JP")
+nwiizo           67385   0.1  0.1 411945728  19440   ??  S    Mon07PM   0:00.62 /System/Library/CoreServices/CoreServicesUIAgent.app/Contents/MacOS/CoreServicesUIAgent
+nwiizo            1450   0.1  0.1 411381184  11200   ??  Ss    7Aug25   0:21.39 /System/Applications/System Settings.app/Contents/PlugIns/GeneralSettings.appex/Contents/MacOS/GeneralSettings
+nwiizo            1457   0.1  0.1 410976048  14480   ??  Ss    7Aug25   0:59.21 /System/Library/ExtensionKit/Extensions/AppleIDSettings.appex/Contents/MacOS/AppleIDSettings
+nwiizo            1315   0.1  0.1 411719568  13424   ??  S     7Aug25   0:38.64 /System/Library/CoreServices/SystemUIServer.app/Contents/MacOS/SystemUIServer
+_networkd          642   0.1  0.1 426967136   8864   ??  Ss    7Aug25   7:54.39 /usr/libexec/symptomsd
+nwiizo           30815   0.1  0.1 411608048  14112   ??  S    Thu10PM   0:44.37 /Library/Application Support/Microsoft/MAU2.0/Microsoft AutoUpdate.app/Contents/MacOS/Microsoft Update Assistant.app/Contents/MacOS/Microsoft Update Assistant --launchByAgent
+nwiizo            1308   0.1  0.2 1622458656  38048   ??  S     7Aug25   3:34.80 /Applications/Obsidian.app/Contents/MacOS/Obsidian
+nwiizo            1305   0.1  0.3 445603568  45776   ??  S     7Aug25  15:48.94 /Applications/Microsoft Teams.app/Contents/MacOS/MSTeams
+nwiizo           65804   0.1  0.1 427127104  14544   ??  S    Mon06PM   0:00.58 /System/Library/CoreServices/CoreLocationAgent.app/Contents/MacOS/CoreLocationAgent
+nwiizo            1294   0.1  0.1 412394560  19408   ??  S     7Aug25   0:43.78 /System/Applications/System Settings.app/Contents/MacOS/System Settings
+root              1289   0.1  0.0 426950448   4512   ??  Ss    7Aug25  11:53.29 /System/Library/PrivateFrameworks/AmbientDisplay.framework/Versions/A/XPCServices/com.apple.AmbientDisplayAgent.xpc/Contents/MacOS/com.apple.AmbientDisplayAgent
+nwiizo            1283   0.1  0.1 411834096  10528   ??  S     7Aug25   0:27.85 /System/Library/CoreServices/WallpaperAgent.app/Contents/MacOS/WallpaperAgent
+nwiizo           39898   0.1  0.2 444298016  26960   ??  S    Sun02PM   0:08.00 /Applications/Arc.app/Contents/Frameworks/ArcCore.framework/Helpers/Browser Helper (Plugin).app/Contents/MacOS/Browser Helper (Plugin) --type=utility --utility-sub-type=video_capture.mojom.VideoCaptureService --lang=ja --service-sandbox-type=none --message-loop-type-ui --user-data-dir=/Users/nwiizo/Library/Application Support/Arc/User Data --bcny-app-id=0 --shared-files --metrics-shmem-handle=1752395122,r,13802843793409732125,14658805547829091121,524288 --field-trial-handle=1718379636,r,8591501679424107338,11219274092750747027,262144 --variations-seed-version
+nwiizo           63648   0.1  0.3 412397104  44096   ??  S    Mon05PM   0:11.58 /System/Applications/Calendar.app/Contents/MacOS/Calendar
+nwiizo            6064   0.1  0.1 427318608  10144   ??  S     7Aug25   0:17.05 /System/Library/CoreServices/UserNotificationCenter.app/Contents/MacOS/UserNotificationCenter
+nwiizo           43423   0.1  0.1 416584048  24736   ??  S    Sun05PM   0:16.35 /System/Applications/Music.app/Contents/MacOS/Music

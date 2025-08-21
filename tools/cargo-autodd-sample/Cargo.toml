@@ -1,0 +1,11 @@
+[package]
+name = "A"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+
+[dependencies.proconio]
+version = "^0.5.0"
+
+
