@@ -1,0 +1,38 @@
+[package]
+name = "rust-signal-ipc"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# シグナル処理（基本的なものから始める）
+signal-hook = "0.3"
+ctrlc = "3.4"
+
+# エラーハンドリング
+thiserror = "2.0"
+anyhow = "1.0"
+
+# ユーティリティ
+chrono = { version = "0.4", features = ["serde"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+# シリアライゼーション（プロセス間通信で必要）
+serde = { version = "1.0", features = ["derive"] }
+bincode = "1.3"
+
+[dev-dependencies]
+# テスト用
+tokio-test = "0.4"
+
+[[bin]]
+name = "signal-handler"
+path = "src/bin/signal_handler.rs"
+
+[[bin]]
+name = "unix-socket-server"
+path = "src/bin/unix_socket_server.rs"
+
+[[bin]]
+name = "unix-socket-client"
+path = "src/bin/unix_socket_client.rs"
