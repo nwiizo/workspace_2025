@@ -43,6 +43,40 @@ Rustを使ったLinuxプロセス管理の包括的なサンプル集です。
 - リソース制限
 - 自動クリーンアップ
 
+### 8. Nixクレートのサンプル
+
+#### 基本的なfork (`nix_fork_basic`)
+- nixクレートを使ったシンプルなfork例
+
+#### マルチワーカー (`nix_multi_worker`)
+- 複数のワーカープロセスの生成と管理
+
+#### Fork + Exec (`nix_fork_exec`)
+- nixクレートでのfork + execパターン
+
+#### シグナルハンドラ (`nix_signal_handler`)
+- nixクレートを使ったシグナル処理
+
+#### デーモン化 (`nix_daemon`)
+- ダブルフォークによるデーモンプロセスの作成
+
+### 9. 記事用サンプル
+
+#### シンプルなコマンド実行 (`article_simple_command`)
+- 最も基本的なコマンド実行例
+
+#### パイプ通信 (`article_pipe_communication`)
+- パイプを使ったプロセス間通信
+
+#### シグナル制御 (`article_signal_control`)
+- nixクレートによるシグナル送信
+
+#### プロセスグループ (`article_process_group`)
+- プロセスグループの管理とシグナル送信
+
+#### 統合デモ (`article_demo`)
+- ProcessGuardとProcessPoolの実用例
+
 ## ビルドと実行
 
 ### 依存関係のインストール
@@ -72,6 +106,47 @@ cargo run --bin process_group
 
 # セキュアなプロセス起動
 cargo run --bin secure_spawn
+
+# === Nixクレートのサンプル ===
+# 基本的なfork
+cargo run --bin nix_fork_basic
+
+# マルチワーカー
+cargo run --bin nix_multi_worker
+
+# Fork + Exec
+cargo run --bin nix_fork_exec
+
+# シグナルハンドラ
+cargo run --bin nix_signal_handler
+
+# デーモン化
+cargo run --bin nix_daemon
+
+# === 記事用サンプル ===
+# シンプルなコマンド実行
+cargo run --bin article_simple_command
+
+# パイプ通信
+cargo run --bin article_pipe_communication
+
+# シグナル制御
+cargo run --bin article_signal_control
+
+# プロセスグループ
+cargo run --bin article_process_group
+
+# 統合デモ
+cargo run --bin article_demo
+```
+
+### 全バイナリのビルド確認
+```bash
+# 全バイナリをビルドして確認
+cargo build --bins
+
+# 全バイナリの一覧表示
+cargo build --bins 2>&1 | grep "Compiling\|Building\|Finished"
 ```
 
 ## 注意事項

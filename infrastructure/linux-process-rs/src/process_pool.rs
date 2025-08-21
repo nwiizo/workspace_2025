@@ -7,8 +7,6 @@ use crate::process_guard::ProcessGuard;
 use nix::unistd::Pid;
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
-use std::thread;
-use std::time::Duration;
 
 /// ワーカープロセスの状態
 #[derive(Debug, Clone, PartialEq)]
@@ -48,11 +46,12 @@ impl ProcessPool {
     /// let pool = ProcessPool::new("MyPool", 5);
     /// ```
     pub fn new(name: impl Into<String>, max_workers: usize) -> Self {
-        println!("ProcessPool '{}': 最大{}ワーカーで初期化", name.as_ref(), max_workers);
+        let name = name.into();
+        println!("ProcessPool '{}': 最大{}ワーカーで初期化", name, max_workers);
         Self {
             workers: Arc::new(Mutex::new(HashMap::new())),
             max_workers,
-            name: name.into(),
+            name,
         }
     }
     
@@ -116,7 +115,7 @@ impl ProcessPool {
     pub fn terminate_worker(&self, pid: Pid) -> ProcessResult<()> {
         let mut workers = self.workers.lock().unwrap();
         
-        if let Some((mut guard, info)) = workers.remove(&pid) {
+        if let Some((mut guard, _info)) = workers.remove(&pid) {
             println!("ProcessPool '{}': ワーカー終了 - PID: {}", self.name, pid);
             
             // wait()を呼んで確実に終了を待つ
@@ -141,7 +140,7 @@ impl ProcessPool {
         println!("ProcessPool '{}': 全{}ワーカーを終了します", self.name, pids.len());
         
         for pid in pids {
-            if let Some((mut guard, _info)) = workers.remove(&pid) {
+            if let Some((guard, _info)) = workers.remove(&pid) {
                 // ProcessGuardのDropが自動的にクリーンアップを行う
                 drop(guard);
             }

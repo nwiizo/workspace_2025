@@ -33,7 +33,7 @@ fn demo_process_guard() -> Result<(), Box<dyn std::error::Error>> {
     
     {
         println!("スコープ開始: ProcessGuardを作成");
-        let mut guard = ProcessGuard::new_with_args("sleep", &["2"])?;
+        let guard = ProcessGuard::new_with_args("sleep", &["2"])?;
         
         println!("PID: {:?}", guard.pid());
         println!("実行中: {}", guard.is_running());

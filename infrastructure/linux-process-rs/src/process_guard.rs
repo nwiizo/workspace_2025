@@ -81,11 +81,11 @@ impl ProcessGuard {
             // 直接ステータスを確認する別の方法を使用
             #[cfg(unix)]
             {
-                use nix::sys::signal::{kill, Signal};
+                use nix::sys::signal::kill;
                 use nix::unistd::Pid;
                 let pid = Pid::from_raw(child.id() as i32);
                 // シグナル0を送信してプロセスの存在を確認
-                kill(pid, Signal::from(0)).is_ok()
+                kill(pid, None).is_ok()
             }
             #[cfg(not(unix))]
             {

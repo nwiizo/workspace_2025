@@ -3,7 +3,7 @@
 /// 複数のプロセスをグループとして管理し、まとめてシグナルを送信します。
 /// nixクレートのsetpgid、killpgを使用します。
 use nix::sys::signal::{killpg, Signal};
-use nix::unistd::{fork, setpgid, ForkResult, Pid};
+use nix::unistd::{fork, setpgid, ForkResult};
 use nix::sys::wait::waitpid;
 use std::thread::sleep;
 use std::time::Duration;
@@ -23,7 +23,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             // さらに子プロセスを作成（同じグループに追加）
             for i in 1..3 {
                 match unsafe { fork() }? {
-                    ForkResult::Parent { new_child } => {
+                    ForkResult::Parent { child: new_child } => {
                         // 新しい子プロセスを同じグループに追加
                         setpgid(new_child, child)?;
                         println!("親: プロセス {} をグループ {} に追加", new_child, child);
