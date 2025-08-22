@@ -41,9 +41,26 @@ impl IPCError {
     
     /// エラーが再試行可能かどうかを判定
     pub fn is_retryable(&self) -> bool {
+        match self {
+            // ネットワーク系のエラーは基本的に再試行可能
+            Self::Io(e) => !matches!(
+                e.kind(),
+                std::io::ErrorKind::NotFound 
+                | std::io::ErrorKind::PermissionDenied 
+                | std::io::ErrorKind::InvalidInput
+            ),
+            Self::Connection(_) => true,
+            // プロトコルエラーとシリアライゼーションエラーは再試行不可
+            Self::Protocol(_) | Self::Serialization(_) => false,
+            Self::Other(_) => false,
+        }
+    }
+    
+    /// エラーが致命的かどうかを判定
+    pub fn is_fatal(&self) -> bool {
         matches!(
             self,
-            Self::Io(_) | Self::Connection(_)
+            Self::Protocol(_) | Self::Serialization(_)
         )
     }
 }

@@ -5,5 +5,6 @@
 
 pub mod errors;
 pub mod ipc;
+pub mod examples;
 
 pub use errors::{IPCError, Result};

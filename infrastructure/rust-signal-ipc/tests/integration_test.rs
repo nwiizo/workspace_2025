@@ -4,6 +4,7 @@
 
 use rust_signal_ipc::ipc::{IPCMessage, MessageType};
 use rust_signal_ipc::errors::IPCError;
+use uuid::Uuid;
 
 #[test]
 fn test_message_round_trip() {
@@ -20,8 +21,10 @@ fn test_message_types() {
     let request = IPCMessage::request(b"req".to_vec());
     assert_eq!(request.message_type, MessageType::Request);
     
-    let response = IPCMessage::response(b"res".to_vec());
+    let request_id = Uuid::new_v4();
+    let response = IPCMessage::response(b"res".to_vec(), request_id);
     assert_eq!(response.message_type, MessageType::Response);
+    assert_eq!(response.correlation_id, Some(request_id));
     
     let notification = IPCMessage::notification(b"notif".to_vec());
     assert_eq!(notification.message_type, MessageType::Notification);
@@ -29,18 +32,27 @@ fn test_message_types() {
 
 #[test]
 fn test_error_types() {
-    // Protocol error
+    // Protocol error (fatal, not retryable)
     let err = IPCError::protocol("invalid version");
     assert!(!err.is_retryable());
+    assert!(err.is_fatal());
     
-    // IO error (retryable)
+    // IO error - ConnectionRefused (retryable)
     let io_err = std::io::Error::new(std::io::ErrorKind::ConnectionRefused, "test");
     let err = IPCError::from(io_err);
     assert!(err.is_retryable());
+    assert!(!err.is_fatal());
+    
+    // IO error - PermissionDenied (not retryable)
+    let io_err = std::io::Error::new(std::io::ErrorKind::PermissionDenied, "test");
+    let err = IPCError::from(io_err);
+    assert!(!err.is_retryable());
+    assert!(!err.is_fatal());
     
     // Connection error (retryable)
     let err = IPCError::connection("connection lost");
     assert!(err.is_retryable());
+    assert!(!err.is_fatal());
 }
 
 #[test]

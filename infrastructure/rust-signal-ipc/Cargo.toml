@@ -4,9 +4,19 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-# シグナル処理（基本的なものから始める）
+# シグナル処理
 signal-hook = "0.3"
+signal-hook-tokio = { version = "0.3", features = ["futures-v0_3"] }
 ctrlc = "3.4"
+nix = { version = "0.29", features = ["signal", "process"] }
+libc = "0.2"
+
+# 非同期処理（検証用）
+tokio = { version = "1.46", features = ["rt-multi-thread", "macros", "signal", "time", "sync", "fs", "net", "io-util"] }
+tokio-util = "0.7"
+uuid = { version = "1.10", features = ["v4", "serde"] }
+futures = "0.3"
+async-trait = "0.1"
 
 # エラーハンドリング
 thiserror = "2.0"
@@ -19,11 +29,17 @@ tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 
 # シリアライゼーション（プロセス間通信で必要）
 serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
 bincode = "1.3"
+
+# その他
+rand = "0.8"
 
 [dev-dependencies]
 # テスト用
 tokio-test = "0.4"
+proptest = "1.0"
+criterion = "0.5"
 
 [[bin]]
 name = "signal-handler"
@@ -36,3 +52,39 @@ path = "src/bin/unix_socket_server.rs"
 [[bin]]
 name = "unix-socket-client"
 path = "src/bin/unix_socket_client.rs"
+
+[[bin]]
+name = "ipc-server"
+path = "src/bin/ipc_server.rs"
+
+[[bin]]
+name = "ipc-client"
+path = "src/bin/ipc_client.rs"
+
+[[bin]]
+name = "ipc-pubsub"
+path = "src/bin/ipc_pubsub.rs"
+
+[[bin]]
+name = "ipc-multiclient"
+path = "src/bin/ipc_multiclient.rs"
+
+[[bin]]
+name = "signal-validator"
+path = "src/bin/signal_validator.rs"
+
+[[bin]]
+name = "graceful-shutdown"
+path = "src/bin/graceful_shutdown.rs"
+
+[[bin]]
+name = "async-retry"
+path = "src/bin/async_retry.rs"
+
+[profile.release]
+debug = true        # デバッグ情報を含める
+lto = "fat"        # Link Time Optimization
+codegen-units = 1  # 最適化を最大化
+
+[profile.bench]
+debug = true       # ベンチマークでもデバッグ情報を含める
