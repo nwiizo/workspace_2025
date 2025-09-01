@@ -255,3 +255,45 @@ Temporary Items
 *.ori
 *.orig
 *.tmp
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# Next.js
+.next/
+out/
+.vercel
+*.tsbuildinfo
+next-env.d.ts
+
+# Testing
+coverage/
+*.lcov
+.nyc_output
+
+# Turbo
+.turbo/
+
+# misc
+*.pem
+*.swp
+*.swo
+
+# Test files (not for production)
+**/public/test-*.js
+**/public/simulate-*.js
+**/public/comprehensive-*.js
+**/public/dynamic-*.js
+**/public/run-all-*.js
+**/test-*.js
+**/simulate-*.js
+
+# Screenshots and temp files
+screenshot.sh
+screenshots/
+*.png.tmp
