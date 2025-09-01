@@ -9,7 +9,8 @@ import {
   Zap, Flag, Filter, Search, MoreVertical, Settings,
   Moon, Sun, Archive, FolderOpen, Star,
   Download, Upload, Copy, ClipboardCheck, FileJson,
-  Keyboard, HelpCircle, Command, GripVertical, Maximize2, Minimize2
+  Keyboard, HelpCircle, Command, GripVertical, Maximize2, Minimize2,
+  Save, BookOpen, Share2, Link
 } from "lucide-react";
 
 type TimerMode = "work" | "shortBreak" | "longBreak";
@@ -31,12 +32,25 @@ type Todo = {
   order?: number;
 };
 
+type TaskTemplate = {
+  id: string;
+  name: string;
+  text: string;
+  priority: Priority;
+  pomodorosEstimated: number;
+  tags: string[];
+  usageCount: number;
+};
+
 type Stats = {
   todayPomodoros: number;
   weekPomodoros: number;
   totalTasks: number;
   completedTasks: number;
   streak: number;
+  dailyHistory?: Record<string, number>;
+  weeklyHistory?: Record<string, number>;
+  monthlyHistory?: Record<string, number>;
 };
 
 const TIMER_SETTINGS = {
@@ -116,6 +130,12 @@ export default function Home() {
   const [draggedItem, setDraggedItem] = useState<Todo | null>(null);
   const [dragOverItem, setDragOverItem] = useState<string | null>(null);
   const [focusMode, setFocusMode] = useState(false);
+  const [showStats, setShowStats] = useState(false);
+  const [statsView, setStatsView] = useState<'daily' | 'weekly' | 'monthly'>('daily');
+  const [templates, setTemplates] = useState<TaskTemplate[]>([]);
+  const [showTemplates, setShowTemplates] = useState(false);
+  const [shareUrl, setShareUrl] = useState<string>("");
+  const [showShareModal, setShowShareModal] = useState(false);
   
   // Stats
   const [stats, setStats] = useState<Stats>({
@@ -136,10 +156,12 @@ export default function Home() {
     const savedTodos = localStorage.getItem("todos");
     const savedStats = localStorage.getItem("stats");
     const savedDarkMode = localStorage.getItem("darkMode");
+    const savedTemplates = localStorage.getItem("templates");
     
     if (savedTodos) setTodos(JSON.parse(savedTodos));
     if (savedStats) setStats(JSON.parse(savedStats));
     if (savedDarkMode) setDarkMode(savedDarkMode === "true");
+    if (savedTemplates) setTemplates(JSON.parse(savedTemplates));
   }, []);
 
   useEffect(() => {
@@ -186,11 +208,31 @@ export default function Home() {
     
     if (mode === "work") {
       setCompletedPomodoros(prev => prev + 1);
-      setStats(prev => ({
-        ...prev,
-        todayPomodoros: prev.todayPomodoros + 1,
-        weekPomodoros: prev.weekPomodoros + 1
-      }));
+      const today = new Date().toISOString().split('T')[0];
+      const week = `${new Date().getFullYear()}-W${Math.ceil((new Date().getDate() + new Date(new Date().getFullYear(), new Date().getMonth(), 1).getDay()) / 7)}`;
+      const month = new Date().toISOString().slice(0, 7);
+      
+      setStats(prev => {
+        const newStats = {
+          ...prev,
+          todayPomodoros: prev.todayPomodoros + 1,
+          weekPomodoros: prev.weekPomodoros + 1,
+          dailyHistory: {
+            ...prev.dailyHistory,
+            [today]: (prev.dailyHistory?.[today] || 0) + 1
+          },
+          weeklyHistory: {
+            ...prev.weeklyHistory,
+            [week]: (prev.weeklyHistory?.[week] || 0) + 1
+          },
+          monthlyHistory: {
+            ...prev.monthlyHistory,
+            [month]: (prev.monthlyHistory?.[month] || 0) + 1
+          }
+        };
+        localStorage.setItem('stats', JSON.stringify(newStats));
+        return newStats;
+      });
       
       if (selectedTodoId) {
         setTodos(todos.map(todo =>
@@ -327,6 +369,11 @@ export default function Home() {
         toggleFocusMode();
       }
       
+      // S: 統計表示
+      if (e.key === 's' || e.key === 'S') {
+        setShowStats(!showStats);
+      }
+      
       // Escape: モーダルを閉じる/集中モード終了
       if (e.key === 'Escape') {
         if (focusMode) {
@@ -334,13 +381,14 @@ export default function Home() {
         } else {
           setShowExportImport(false);
           setShowKeyboardHelp(false);
+          setShowStats(false);
         }
       }
     };
 
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [darkMode, showKeyboardHelp, focusMode]);
+  }, [darkMode, showKeyboardHelp, focusMode, showStats]);
 
   // TODO functions
   const addTodo = () => {
@@ -482,6 +530,106 @@ export default function Home() {
     }
   };
 
+  // Share functions
+  const generateShareUrl = () => {
+    const shareData = {
+      todos: todos.filter(t => !t.completed),
+      createdAt: new Date().toISOString(),
+      sharedBy: 'Pomodoro Flow User'
+    };
+    
+    const encoded = btoa(encodeURIComponent(JSON.stringify(shareData)));
+    const url = `${window.location.origin}${window.location.pathname}?shared=${encoded}`;
+    setShareUrl(url);
+    setShowShareModal(true);
+  };
+
+  const copyShareUrl = async () => {
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      // Show success feedback (you could add a toast notification here)
+    } catch (err) {
+      console.error('Failed to copy:', err);
+    }
+  };
+
+  // Load shared data from URL
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const sharedData = urlParams.get('shared');
+    
+    if (sharedData) {
+      try {
+        const decoded = JSON.parse(decodeURIComponent(atob(sharedData)));
+        if (decoded.todos && Array.isArray(decoded.todos)) {
+          // Ask user if they want to import shared tasks
+          if (confirm('共有されたタスクリストをインポートしますか？')) {
+            const importedTodos = decoded.todos.map((todo: any) => ({
+              ...todo,
+              id: Date.now().toString() + Math.random(),
+              createdAt: new Date()
+            }));
+            setTodos(prev => [...prev, ...importedTodos]);
+          }
+          // Clean URL
+          window.history.replaceState({}, document.title, window.location.pathname);
+        }
+      } catch (err) {
+        console.error('Failed to parse shared data:', err);
+      }
+    }
+  }, []);
+
+  // Template functions
+  const saveAsTemplate = (todo: Todo) => {
+    const template: TaskTemplate = {
+      id: Date.now().toString(),
+      name: todo.text.slice(0, 30),
+      text: todo.text,
+      priority: todo.priority,
+      pomodorosEstimated: todo.pomodorosEstimated,
+      tags: todo.tags,
+      usageCount: 0
+    };
+    
+    const newTemplates = [...templates, template];
+    setTemplates(newTemplates);
+    localStorage.setItem('templates', JSON.stringify(newTemplates));
+  };
+
+  const useTemplate = (template: TaskTemplate) => {
+    const newTodo: Todo = {
+      id: Date.now().toString(),
+      text: template.text,
+      completed: false,
+      priority: template.priority,
+      pomodorosCompleted: 0,
+      pomodorosEstimated: template.pomodorosEstimated,
+      createdAt: new Date(),
+      tags: template.tags,
+      order: todos.reduce((max, t) => Math.max(max, t.order || 0), 0) + 1
+    };
+    
+    setTodos([newTodo, ...todos]);
+    
+    // Update usage count
+    const updatedTemplates = templates.map(t => 
+      t.id === template.id 
+        ? { ...t, usageCount: t.usageCount + 1 }
+        : t
+    );
+    setTemplates(updatedTemplates);
+    localStorage.setItem('templates', JSON.stringify(updatedTemplates));
+    
+    setShowTemplates(false);
+  };
+
+  const deleteTemplate = (templateId: string) => {
+    const newTemplates = templates.filter(t => t.id !== templateId);
+    setTemplates(newTemplates);
+    localStorage.setItem('templates', JSON.stringify(newTemplates));
+  };
+
   // Focus mode functions
   const toggleFocusMode = () => {
     if (!focusMode) {
@@ -621,6 +769,20 @@ export default function Home() {
                 title="キーボードショートカット (Cmd/Ctrl + K)"
               >
                 <Keyboard className="w-5 h-5" />
+              </button>
+              <button
+                onClick={() => setShowStats(!showStats)}
+                className="p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                title="統計グラフ (S)"
+              >
+                <BarChart3 className="w-5 h-5" />
+              </button>
+              <button
+                onClick={generateShareUrl}
+                className="p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                title="タスクリストを共有"
+              >
+                <Share2 className="w-5 h-5" />
               </button>
               <button
                 onClick={handleExport}
@@ -1146,6 +1308,13 @@ export default function Home() {
                       placeholder="🍅"
                     />
                     <button
+                      onClick={() => setShowTemplates(true)}
+                      className="px-4 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-lg font-medium transition-all transform hover:scale-105"
+                      title="テンプレートから追加"
+                    >
+                      <BookOpen className="w-5 h-5" />
+                    </button>
+                    <button
                       onClick={addTodo}
                       className="px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-lg font-medium transition-all transform hover:scale-105"
                     >
@@ -1257,6 +1426,16 @@ export default function Home() {
                         )}
                         
                         <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              saveAsTemplate(todo);
+                            }}
+                            className="p-1 text-gray-400 hover:text-blue-500 transition-colors"
+                            title="テンプレートとして保存"
+                          >
+                            <Save className="w-4 h-4" />
+                          </button>
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
@@ -1560,6 +1739,294 @@ export default function Home() {
                     必要に応じて先に現在のデータをエクスポートしてください。
                   </p>
                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Statistics Modal */}
+      {showStats && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
+            <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                  <BarChart3 className="w-6 h-6" />
+                  統計情報
+                </h2>
+                <button
+                  onClick={() => setShowStats(false)}
+                  className="p-2 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+
+            <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+              {/* View Selector */}
+              <div className="flex gap-2 mb-6">
+                {(['daily', 'weekly', 'monthly'] as const).map(view => (
+                  <button
+                    key={view}
+                    onClick={() => setStatsView(view)}
+                    className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                      statsView === view
+                        ? 'bg-red-500 text-white'
+                        : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                    }`}
+                  >
+                    {view === 'daily' ? '日別' : view === 'weekly' ? '週別' : '月別'}
+                  </button>
+                ))}
+              </div>
+
+              {/* Summary Cards */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                <div className="bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-800/20 rounded-xl p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Timer className="w-5 h-5 text-red-600 dark:text-red-400" />
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">今日</span>
+                  </div>
+                  <div className="text-2xl font-bold text-gray-900 dark:text-white">
+                    {stats.todayPomodoros}
+                  </div>
+                  <div className="text-xs text-gray-600 dark:text-gray-400">ポモドーロ</div>
+                </div>
+
+                <div className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 rounded-xl p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Calendar className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">今週</span>
+                  </div>
+                  <div className="text-2xl font-bold text-gray-900 dark:text-white">
+                    {stats.weekPomodoros}
+                  </div>
+                  <div className="text-xs text-gray-600 dark:text-gray-400">ポモドーロ</div>
+                </div>
+
+                <div className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 rounded-xl p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <CheckCircle2 className="w-5 h-5 text-green-600 dark:text-green-400" />
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">完了タスク</span>
+                  </div>
+                  <div className="text-2xl font-bold text-gray-900 dark:text-white">
+                    {stats.completedTasks}
+                  </div>
+                  <div className="text-xs text-gray-600 dark:text-gray-400">タスク</div>
+                </div>
+
+                <div className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 rounded-xl p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Zap className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">連続記録</span>
+                  </div>
+                  <div className="text-2xl font-bold text-gray-900 dark:text-white">
+                    {stats.streak}
+                  </div>
+                  <div className="text-xs text-gray-600 dark:text-gray-400">日</div>
+                </div>
+              </div>
+
+              {/* Chart */}
+              <div className="bg-gray-50 dark:bg-gray-900/50 rounded-xl p-6">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                  {statsView === 'daily' ? '日別' : statsView === 'weekly' ? '週別' : '月別'}ポモドーロ実績
+                </h3>
+                
+                {(() => {
+                  const history = statsView === 'daily' 
+                    ? stats.dailyHistory 
+                    : statsView === 'weekly' 
+                    ? stats.weeklyHistory 
+                    : stats.monthlyHistory;
+
+                  if (!history || Object.keys(history).length === 0) {
+                    return (
+                      <div className="text-center py-12 text-gray-500 dark:text-gray-400">
+                        データがありません
+                      </div>
+                    );
+                  }
+
+                  const entries = Object.entries(history).slice(-10).sort();
+                  const maxValue = Math.max(...entries.map(([_, v]) => v));
+
+                  return (
+                    <div className="space-y-3">
+                      {entries.map(([date, count]) => (
+                        <div key={date} className="flex items-center gap-3">
+                          <div className="w-24 text-sm text-gray-600 dark:text-gray-400 text-right">
+                            {date}
+                          </div>
+                          <div className="flex-1 relative h-8 bg-gray-200 dark:bg-gray-700 rounded">
+                            <div 
+                              className="absolute inset-y-0 left-0 bg-gradient-to-r from-red-400 to-red-500 rounded"
+                              style={{ width: `${(count / maxValue) * 100}%` }}
+                            />
+                            <div className="absolute inset-y-0 left-2 flex items-center text-white text-sm font-medium">
+                              {count}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  );
+                })()}
+              </div>
+
+              {/* Productivity Insights */}
+              <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                <h4 className="font-semibold text-blue-900 dark:text-blue-100 mb-2">
+                  💡 生産性のヒント
+                </h4>
+                <ul className="text-sm text-blue-800 dark:text-blue-200 space-y-1">
+                  <li>• 最も生産的な時間帯を見つけて、重要なタスクをその時間に配置しましょう</li>
+                  <li>• 1日4ポモドーロを目標にして、徐々に増やしていきましょう</li>
+                  <li>• 休憩時間は必ず取り、リフレッシュすることが大切です</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Templates Modal */}
+      {showTemplates && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl max-w-3xl w-full max-h-[90vh] overflow-hidden">
+            <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                  <BookOpen className="w-6 h-6" />
+                  タスクテンプレート
+                </h2>
+                <button
+                  onClick={() => setShowTemplates(false)}
+                  className="p-2 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+
+            <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+              {templates.length === 0 ? (
+                <div className="text-center py-12">
+                  <BookOpen className="w-16 h-16 mx-auto text-gray-300 dark:text-gray-600 mb-4" />
+                  <p className="text-gray-500 dark:text-gray-400 mb-2">テンプレートがありません</p>
+                  <p className="text-sm text-gray-400 dark:text-gray-500">
+                    タスクの保存ボタンからテンプレートを作成できます
+                  </p>
+                </div>
+              ) : (
+                <div className="grid gap-3">
+                  {templates
+                    .sort((a, b) => b.usageCount - a.usageCount)
+                    .map(template => (
+                      <div
+                        key={template.id}
+                        className="flex items-center gap-3 p-4 bg-gray-50 dark:bg-gray-900/50 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-900/70 transition-colors"
+                      >
+                        <div className="flex-1">
+                          <div className="font-medium text-gray-900 dark:text-white mb-1">
+                            {template.text}
+                          </div>
+                          <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
+                            <span className="flex items-center gap-1">
+                              <Flag className="w-3 h-3" />
+                              {template.priority === 'high' ? '高' : template.priority === 'medium' ? '中' : '低'}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <Timer className="w-3 h-3" />
+                              {template.pomodorosEstimated}
+                            </span>
+                            {template.tags.length > 0 && (
+                              <span className="flex items-center gap-1">
+                                <Hash className="w-3 h-3" />
+                                {template.tags.join(', ')}
+                              </span>
+                            )}
+                            <span className="flex items-center gap-1">
+                              <TrendingUp className="w-3 h-3" />
+                              使用回数: {template.usageCount}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => useTemplate(template)}
+                            className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium transition-colors"
+                          >
+                            使用
+                          </button>
+                          <button
+                            onClick={() => deleteTemplate(template.id)}
+                            className="p-2 text-gray-400 hover:text-red-500 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                          >
+                            <Trash2 className="w-5 h-5" />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Share Modal */}
+      {showShareModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl max-w-2xl w-full">
+            <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                  <Share2 className="w-6 h-6" />
+                  タスクリストを共有
+                </h2>
+                <button
+                  onClick={() => {
+                    setShowShareModal(false);
+                    setShareUrl("");
+                  }}
+                  className="p-2 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+
+            <div className="p-6">
+              <p className="text-gray-600 dark:text-gray-400 mb-4">
+                以下のURLをコピーして、タスクリストを他の人と共有できます。
+                共有される内容は未完了のタスクのみです。
+              </p>
+              
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={shareUrl}
+                  readOnly
+                  className="flex-1 px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white font-mono text-sm"
+                  onClick={(e) => e.currentTarget.select()}
+                />
+                <button
+                  onClick={copyShareUrl}
+                  className="px-4 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium transition-colors flex items-center gap-2"
+                >
+                  <Copy className="w-5 h-5" />
+                  コピー
+                </button>
+              </div>
+
+              <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                <p className="text-sm text-blue-800 dark:text-blue-200">
+                  💡 ヒント: 共有されたリンクを開くと、タスクをインポートするか確認されます。
+                  チーム内でタスクリストを簡単に共有できます。
+                </p>
               </div>
             </div>
           </div>
