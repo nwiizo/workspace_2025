@@ -1,6 +1,14 @@
 # workspace_2025 🎯
 
 ### Goal: Achieve 69kg Weight & Amateur Kickboxing Match 🥊
+
+#### Nutrition Basics & Weight Management 📊
+Carbohydrates, protein, and fat are the three macronutrients that become energy. When these are consumed in excess, it leads to weight gain. 7,200 kcal equals 1kg of weight gain.
+
+Most people consume too many carbohydrates, so reduce those. Keep total intake above basal metabolic rate but below total daily energy expenditure. For adult males, that's around 1,500-2,000 kcal.
+
+Protein builds muscle, so don't reduce it. Reduce fats and carbohydrates. That's it.
+
 1. **Implement Healthy Diet Plan:** 🥗
    - [ ] Create specific meal plans targeting 1800kcal daily
    - [ ] Consume at least 350g of vegetables per meal
