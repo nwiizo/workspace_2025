@@ -1,0 +1,25 @@
+services:
+  postgres:
+    # TimescaleDB + PostGIS + pgvectorを含むPostgreSQLイメージを使用
+    # - TimescaleDB: 時系列データ（Chapter 9: Time Series）
+    # - PostGIS: 地理空間データ（Chapter 10: Geospatial Data）
+    # - pgvector: ベクトル類似度検索（Chapter 8: Generative AI）
+    image: timescale/timescaledb-ha:pg17
+    container_name: just-use-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: coffee_chain
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres-data:

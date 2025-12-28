@@ -1,0 +1,59 @@
+[package]
+name = "just-use-postgres-verification"
+version = "0.1.0"
+edition = "2021"
+description = "Technical verification for 'Just Use Postgres!' book examples using Rust"
+
+[dependencies]
+# PostgreSQL client
+tokio-postgres = { version = "0.7", features = ["with-chrono-0_4", "with-serde_json-1", "with-uuid-1"] }
+deadpool-postgres = "0.14"
+
+# Async runtime
+tokio = { version = "1", features = ["full"] }
+
+# Serialization
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+# Time handling
+chrono = { version = "0.4", features = ["serde"] }
+
+# UUID
+uuid = { version = "1", features = ["v4", "serde"] }
+
+# Error handling
+thiserror = "2"
+anyhow = "1"
+
+# CLI
+clap = { version = "4", features = ["derive"] }
+
+# Decimal for money
+rust_decimal = { version = "1", features = ["db-tokio-postgres"] }
+
+# Pretty printing
+tabled = "0.17"
+colored = "2"
+
+# Web framework
+axum = "0.8"
+axum-extra = { version = "0.10", features = ["cookie-private"] }
+tower-http = { version = "0.6", features = ["cors"] }
+
+# OAuth2 / Authentication
+oauth2 = "5"
+reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }
+sha2 = "0.10"
+hex = "0.4"
+rand = "0.8"
+base64 = "0.22"
+time = "0.3"
+
+[[bin]]
+name = "just-use-postgres"
+path = "src/main.rs"
+
+[[bin]]
+name = "api-server"
+path = "src/server.rs"
