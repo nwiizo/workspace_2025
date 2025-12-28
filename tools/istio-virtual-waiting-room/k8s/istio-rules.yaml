@@ -1,0 +1,266 @@
+# =============================================================================
+# Istio Virtual Waiting Room - Advanced Configuration
+# Istio の機能を最大限活用した設定
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Gateway - Ingress Traffic Entry Point
+# -----------------------------------------------------------------------------
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: waiting-room-gateway
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+    - port:
+        number: 80
+        name: http
+        protocol: HTTP
+      hosts:
+        - "*"
+---
+# -----------------------------------------------------------------------------
+# VirtualService - Advanced Traffic Routing
+# 待合室ベースのルーティング + Header/Cookie Based Routing
+# -----------------------------------------------------------------------------
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: shop-routing
+spec:
+  hosts:
+    - "*"
+  gateways:
+    - waiting-room-gateway
+  http:
+    # Rule 1: Health checks bypass waiting room
+    - match:
+        - uri:
+            exact: /health
+      route:
+        - destination:
+            host: main-application
+            port:
+              number: 80
+
+    # Rule 2: API requests go directly to product-api
+    - match:
+        - uri:
+            prefix: /api/products
+      route:
+        - destination:
+            host: product-api
+            port:
+              number: 80
+      timeout: 10s
+      retries:
+        attempts: 3
+        perTryTimeout: 3s
+        retryOn: "5xx,reset,connect-failure,retriable-4xx"
+        retryRemoteLocalities: true
+
+    # Rule 3: Shop routes go directly to main-application
+    - match:
+        - uri:
+            exact: /shop
+      route:
+        - destination:
+            host: main-application
+            port:
+              number: 80
+      timeout: 30s
+
+    # Rule 4: Users with waiting_room_passed cookie go to main app
+    - match:
+        - headers:
+            cookie:
+              regex: ".*waiting_room_passed=true.*"
+      route:
+        - destination:
+            host: main-application
+            port:
+              number: 80
+      timeout: 30s
+
+    # Rule 5: Waiting room path
+    - match:
+        - uri:
+            prefix: /waiting-room
+      route:
+        - destination:
+            host: waiting-room-app
+            port:
+              number: 80
+      timeout: 5s
+      retries:
+        attempts: 2
+        perTryTimeout: 2s
+
+    # Rule 6: Default - Traffic split between waiting room and main app
+    - route:
+        - destination:
+            host: waiting-room-app
+            port:
+              number: 80
+          weight: 80
+          headers:
+            response:
+              add:
+                x-routed-to: waiting-room
+        - destination:
+            host: main-application
+            port:
+              number: 80
+          weight: 20
+          headers:
+            response:
+              add:
+                x-routed-to: main-application
+---
+# -----------------------------------------------------------------------------
+# DestinationRule - All Services
+# Simple load balancing and circuit breaker settings
+# Note: Aggressive connection pooling can cause issues with Istio
+# -----------------------------------------------------------------------------
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: all-services-dr
+spec:
+  host: "*.default.svc.cluster.local"
+  trafficPolicy:
+    # Circuit Breaker - Outlier Detection
+    outlierDetection:
+      consecutive5xxErrors: 5
+      interval: 10s
+      baseEjectionTime: 30s
+      maxEjectionPercent: 50
+
+    # Load Balancing
+    loadBalancer:
+      simple: ROUND_ROBIN
+---
+# -----------------------------------------------------------------------------
+# PeerAuthentication - Mutual TLS (mTLS) Settings
+# 全サービス間通信を暗号化
+# -----------------------------------------------------------------------------
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  name: default
+  namespace: default
+spec:
+  mtls:
+    mode: PERMISSIVE  # Use STRICT in production
+---
+# -----------------------------------------------------------------------------
+# AuthorizationPolicy - Access Control
+# サービス間のアクセス制御
+# -----------------------------------------------------------------------------
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: product-api-access
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: product-api
+  action: ALLOW
+  rules:
+    # Allow all operations to product-api (demo purposes)
+    # In production, restrict by source principal
+    - to:
+        - operation:
+            methods: ["GET", "POST"]
+            paths: ["/api/*", "/health"]
+---
+# -----------------------------------------------------------------------------
+# RequestAuthentication - JWT Validation (Example placeholder)
+# 本番環境ではJWT認証を有効化
+# -----------------------------------------------------------------------------
+# apiVersion: security.istio.io/v1beta1
+# kind: RequestAuthentication
+# metadata:
+#   name: jwt-auth
+#   namespace: default
+# spec:
+#   selector:
+#     matchLabels:
+#       app: main-application
+#   jwtRules:
+#     - issuer: "https://your-issuer.com"
+#       jwksUri: "https://your-issuer.com/.well-known/jwks.json"
+---
+# -----------------------------------------------------------------------------
+# EnvoyFilter - Custom Response Headers
+# カスタムレスポンスヘッダーの追加
+# -----------------------------------------------------------------------------
+apiVersion: networking.istio.io/v1alpha3
+kind: EnvoyFilter
+metadata:
+  name: custom-response-headers
+  namespace: default
+spec:
+  configPatches:
+    - applyTo: NETWORK_FILTER
+      match:
+        context: GATEWAY
+        listener:
+          filterChain:
+            filter:
+              name: "envoy.filters.network.http_connection_manager"
+      patch:
+        operation: MERGE
+        value:
+          typed_config:
+            "@type": type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager
+            server_header_transformation: APPEND_IF_ABSENT
+---
+# -----------------------------------------------------------------------------
+# ServiceEntry - External Service Access (Example)
+# 外部サービスへのアクセス制御
+# -----------------------------------------------------------------------------
+# apiVersion: networking.istio.io/v1alpha3
+# kind: ServiceEntry
+# metadata:
+#   name: external-api
+# spec:
+#   hosts:
+#     - api.external-service.com
+#   ports:
+#     - number: 443
+#       name: https
+#       protocol: HTTPS
+#   resolution: DNS
+#   location: MESH_EXTERNAL
+---
+# -----------------------------------------------------------------------------
+# Telemetry - Metrics and Tracing Configuration
+# メトリクスとトレーシングの設定
+# -----------------------------------------------------------------------------
+apiVersion: telemetry.istio.io/v1alpha1
+kind: Telemetry
+metadata:
+  name: mesh-default
+  namespace: default
+spec:
+  # Tracing configuration
+  tracing:
+    - randomSamplingPercentage: 100.0
+      customTags:
+        environment:
+          literal:
+            value: "demo"
+        app_version:
+          literal:
+            value: "v1"
+
+  # Access logging
+  accessLogging:
+    - providers:
+        - name: envoy
+      filter:
+        expression: "response.code >= 400"

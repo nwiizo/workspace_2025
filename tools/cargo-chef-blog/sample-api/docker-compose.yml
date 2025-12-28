@@ -1,0 +1,31 @@
+services:
+  # Standard cargo-chef build (3-stage)
+  api-standard:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sample-api-standard
+    ports:
+      - "8080:8080"
+    environment:
+      - RUST_LOG=info
+    restart: unless-stopped
+
+  # Optimized build with sccache and BuildKit cache mounts
+  api-optimized:
+    build:
+      context: .
+      dockerfile: Dockerfile.optimized
+      # Enable BuildKit features
+      args:
+        BUILDKIT_INLINE_CACHE: 1
+    container_name: sample-api-optimized
+    ports:
+      - "8081:8080"
+    environment:
+      - RUST_LOG=info
+    restart: unless-stopped
+
+# Volume for persistent sccache
+volumes:
+  sccache:

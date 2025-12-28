@@ -1,0 +1,22 @@
+# nix-direnv のキャッシュディレクトリ
+.direnv/
+
+# Nix ビルド成果物
+result
+result-*
+
+# Node.js (react-project, nodejs-project)
+node_modules/
+dist/
+.vite/
+
+# Python (python-project)
+.venv/
+__pycache__/
+*.pyc
+
+# Rust (rust-project)
+target/
+
+# Go (go-project)
+bin/

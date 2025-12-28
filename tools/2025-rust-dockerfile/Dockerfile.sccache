@@ -1,0 +1,39 @@
+# syntax=docker/dockerfile:1
+
+# sccache ビルド最適化 - 環境によって効果が異なる実験的パターン
+# 注意：自環境でのベンチマークが必須。一部環境ではオーバーヘッドになる可能性あり
+
+ARG RUST_VERSION=1.85
+ARG APP_NAME=rust-docker-demo
+
+FROM rust:${RUST_VERSION} AS builder
+WORKDIR /app
+
+# sccacheのインストールと設定
+RUN cargo install sccache --version ^0.7
+ENV RUSTC_WRAPPER=sccache \
+    SCCACHE_DIR=/sccache \
+    CARGO_INCREMENTAL=0
+
+# 依存関係のビルド（ダミービルド）
+COPY Cargo.toml Cargo.lock ./
+RUN --mount=type=cache,target=/usr/local/cargo/registry \
+    --mount=type=cache,target=$SCCACHE_DIR,sharing=locked \
+    mkdir src && \
+    echo "fn main() {}" > src/main.rs && \
+    cargo build --release && \
+    rm -rf src
+
+# アプリケーションのビルド
+COPY src ./src
+RUN --mount=type=cache,target=/usr/local/cargo/registry \
+    --mount=type=cache,target=$SCCACHE_DIR,sharing=locked \
+    cargo build --release --bin ${APP_NAME} && \
+    cp ./target/release/${APP_NAME} /bin/server
+
+# 本番ステージ：distroless
+FROM gcr.io/distroless/cc-debian12:nonroot AS runtime
+COPY --from=builder /bin/server /app/
+WORKDIR /app
+EXPOSE 8000
+ENTRYPOINT ["/app/server"]

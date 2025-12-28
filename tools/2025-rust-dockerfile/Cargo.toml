@@ -1,0 +1,17 @@
+[package]
+name = "rust-docker-demo"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+axum = "0.7"
+tokio = { version = "1.41", features = ["full"] }
+tower = "0.5"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Release profile optimizations for smaller binary size
+[profile.release]
+strip = true          # デバッグシンボルを削除
+lto = true           # Link Time Optimization
+codegen-units = 1    # 最大最適化（ビルド時間は長くなる）

@@ -1,0 +1,109 @@
+name: CI with Nix Flake
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  # 基本的な CI（Nix Flake を使用）
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Nix インストール（Determinate Systems 推奨）
+      - uses: DeterminateSystems/nix-installer-action@main
+        with:
+          extra-conf: |
+            accept-flake-config = true
+
+      # Nix キャッシュ
+      - uses: DeterminateSystems/magic-nix-cache-action@main
+
+      # Flake チェック（すべてのチェックを実行）
+      - name: Check flake
+        run: nix flake check
+
+      # treefmt でフォーマットチェック
+      - name: Format check
+        run: nix develop --command treefmt --ci
+
+      # ビルド
+      - name: Build
+        run: nix build
+
+  # 複数プラットフォームでのテスト
+  test-matrix:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: DeterminateSystems/nix-installer-action@main
+      - uses: DeterminateSystems/magic-nix-cache-action@main
+
+      - name: Run tests in devShell
+        run: |
+          nix develop --command bash -c "
+            echo 'Running tests...'
+            # your test command here
+            # cargo test
+            # go test ./...
+            # pytest
+            echo 'Tests passed!'
+          "
+
+  # セキュリティ監査
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: DeterminateSystems/nix-installer-action@main
+      - uses: DeterminateSystems/magic-nix-cache-action@main
+
+      # Flake の依存関係を更新して脆弱性チェック
+      - name: Check outdated flake inputs
+        run: nix flake metadata --json | jq '.locks.nodes'
+
+      # 言語固有のセキュリティ監査
+      - name: Security audit
+        run: |
+          nix develop --command bash -c "
+            # Rust の場合
+            # cargo audit
+
+            # Node.js の場合
+            # npm audit
+
+            # Python の場合
+            # pip-audit
+
+            echo 'Security audit completed'
+          "
+
+  # Cachix を使用したバイナリキャッシュ（オプション）
+  build-with-cachix:
+    runs-on: ubuntu-latest
+    if: false  # 有効にする場合は true に変更
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: cachix/install-nix-action@v27
+        with:
+          nix_path: nixpkgs=channel:nixpkgs-unstable
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+
+      # Cachix キャッシュを設定
+      - uses: cachix/cachix-action@v15
+        with:
+          name: your-cachix-name  # Cachix で作成したキャッシュ名
+          authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+
+      - name: Build with Cachix
+        run: nix build

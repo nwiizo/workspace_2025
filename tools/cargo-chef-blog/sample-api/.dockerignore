@@ -1,0 +1,43 @@
+# Git files
+.git
+.gitignore
+.gitattributes
+
+# Build artifacts
+target/
+**/target/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# macOS
+.DS_Store
+
+# Documentation
+*.md
+!README.md
+docs/
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+
+# Docker files (don't copy into context)
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# Test files
+tests/
+benches/
+
+# Cargo lock for libraries (keep for binaries)
+# Cargo.lock
+
+# Environment files
+.env
+.env.*

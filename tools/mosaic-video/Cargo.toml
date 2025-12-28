@@ -1,0 +1,27 @@
+[package]
+name = "mosaic-video"
+version = "0.1.0"
+edition = "2024"
+authors = ["nwiizo"]
+description = "Convert MP3 to video with random mosaic patterns"
+license = "MIT"
+
+[dependencies]
+# CLI
+clap = { version = "4", features = ["derive"] }
+
+# Image generation
+image = "0.25"
+
+# Audio metadata
+symphonia = { version = "0.5", features = ["mp3"] }
+
+# Noise generation
+noise = "0.9"
+
+# Utilities
+rand = "0.8"
+indicatif = "0.17"
+anyhow = "1"
+thiserror = "1"
+tempfile = "3"

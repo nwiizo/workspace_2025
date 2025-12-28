@@ -1,0 +1,33 @@
+# syntax=docker/dockerfile:1
+
+# musl 静的リンクビルド - 最小サイズ優先
+ARG RUST_VERSION=1.85
+ARG TARGETARCH
+
+FROM rust:${RUST_VERSION}-alpine AS builder
+WORKDIR /app
+
+# musl開発ツールとOpenSSLのインストール
+RUN apk add --no-cache musl-dev openssl-dev openssl-libs-static
+
+# 依存関係のキャッシュ（ダミービルド）
+# muslターゲットはデフォルトなので明示的な指定不要
+COPY Cargo.toml Cargo.lock ./
+RUN --mount=type=cache,target=/usr/local/cargo/registry \
+    mkdir src && \
+    echo "fn main() {}" > src/main.rs && \
+    cargo build --release && \
+    rm -rf src
+
+# 実際のアプリケーションのビルド
+COPY src ./src
+RUN --mount=type=cache,target=/usr/local/cargo/registry \
+    --mount=type=cache,target=/app/target \
+    cargo build --release && \
+    cp ./target/release/rust-docker-demo /app/server
+
+# 最小ランタイム - scratch（0バイト）
+FROM scratch
+COPY --from=builder /app/server /server
+EXPOSE 8000
+ENTRYPOINT ["/server"]

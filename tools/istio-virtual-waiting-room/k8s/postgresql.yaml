@@ -1,0 +1,152 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-init
+data:
+  init.sql: |
+    CREATE TABLE IF NOT EXISTS products (
+      id SERIAL PRIMARY KEY,
+      name VARCHAR(255) NOT NULL,
+      description TEXT,
+      price VARCHAR(50) NOT NULL,
+      stock INTEGER NOT NULL DEFAULT 0
+    );
+
+    INSERT INTO products (name, description, price, stock) VALUES
+      ('限定スニーカー', 'プレミアム限定エディションスニーカー', '29,800', 3),
+      ('コラボTシャツ', '特別コラボレーションTシャツ', '8,900', 5),
+      ('コレクターズウォッチ', '限定アニバーサリーエディション時計', '158,000', 2),
+      ('レアレコード', '初回プレス限定ヴァイナル', '12,800', 4),
+      ('デザイナーバッグ', '限定デザイナーコラボバッグ', '89,000', 1)
+    ON CONFLICT DO NOTHING;
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+  labels:
+    app: postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+        version: v1
+      annotations:
+        # Enable Istio sidecar for mTLS and access control
+        sidecar.istio.io/inject: "true"
+        # Exclude PostgreSQL port from Istio for direct TCP handling
+        traffic.sidecar.istio.io/excludeInboundPorts: ""
+        traffic.sidecar.istio.io/includeInboundPorts: "5432"
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:15-alpine
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_DB
+              value: shop
+            - name: POSTGRES_USER
+              value: shopuser
+            - name: POSTGRES_PASSWORD
+              value: shoppass
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+          volumeMounts:
+            - name: postgres-storage
+              mountPath: /var/lib/postgresql/data
+            - name: init-script
+              mountPath: /docker-entrypoint-initdb.d
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "500m"
+      volumes:
+        - name: postgres-storage
+          emptyDir: {}
+        - name: init-script
+          configMap:
+            name: postgres-init
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+  labels:
+    app: postgres
+spec:
+  selector:
+    app: postgres
+  ports:
+    - name: tcp-postgres
+      port: 5432
+      targetPort: 5432
+---
+# -----------------------------------------------------------------------------
+# DestinationRule - PostgreSQL Connection Pool
+# データベース接続プール設定
+# -----------------------------------------------------------------------------
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: postgres-dr
+spec:
+  host: postgres
+  trafficPolicy:
+    connectionPool:
+      tcp:
+        maxConnections: 50
+        connectTimeout: 10s
+    # Circuit breaker for database
+    outlierDetection:
+      consecutive5xxErrors: 3
+      interval: 30s
+      baseEjectionTime: 60s
+      maxEjectionPercent: 100
+---
+# -----------------------------------------------------------------------------
+# AuthorizationPolicy - PostgreSQL Access Control
+# product-api のみ PostgreSQL へのアクセスを許可
+# -----------------------------------------------------------------------------
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: postgres-access
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: postgres
+  action: ALLOW
+  rules:
+    # Only allow product-api to connect
+    - from:
+        - source:
+            principals: ["cluster.local/ns/default/sa/default"]
+      to:
+        - operation:
+            ports: ["5432"]
+---
+# -----------------------------------------------------------------------------
+# PeerAuthentication - PostgreSQL mTLS
+# PostgreSQL への接続は mTLS 必須
+# -----------------------------------------------------------------------------
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  name: postgres-mtls
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: postgres
+  mtls:
+    mode: STRICT

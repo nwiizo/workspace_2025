@@ -1,0 +1,106 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: waiting-room-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: waiting-room-app
+  template:
+    metadata:
+      labels:
+        app: waiting-room-app
+    spec:
+      containers:
+        - name: waiting-room-app
+          image: waiting-room-app:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources:
+            requests:
+              memory: "32Mi"
+              cpu: "50m"
+            limits:
+              memory: "64Mi"
+              cpu: "100m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: waiting-room-app
+spec:
+  selector:
+    app: waiting-room-app
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: main-application
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: main-application
+  template:
+    metadata:
+      labels:
+        app: main-application
+    spec:
+      containers:
+        - name: main-application
+          image: main-application:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+          env:
+            - name: PRODUCT_API_URL
+              value: "http://product-api"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources:
+            requests:
+              memory: "32Mi"
+              cpu: "50m"
+            limits:
+              memory: "64Mi"
+              cpu: "100m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: main-application
+spec:
+  selector:
+    app: main-application
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080

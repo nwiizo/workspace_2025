@@ -1,0 +1,74 @@
+# Optimized Dockerfile with sccache and BuildKit cache mounts
+# This provides two-layer caching:
+# - cargo-chef: coarse-grained (entire dependency layer)
+# - sccache: fine-grained (individual compilation artifacts)
+
+# Stage 1: Base - Install cargo-chef and sccache
+FROM rust:1.83-bookworm AS base
+
+# Install cargo-chef and sccache
+RUN cargo install --locked cargo-chef sccache
+
+# Set sccache environment variables
+ENV RUSTC_WRAPPER=sccache \
+    SCCACHE_DIR=/sccache
+
+WORKDIR /app
+
+# Stage 2: Planner - Generate recipe.json
+FROM base AS planner
+COPY . .
+RUN cargo chef prepare --recipe-path recipe.json
+
+# Stage 3: Builder - Build dependencies and application with caching
+FROM base AS builder
+
+# Copy the recipe from planner stage
+COPY --from=planner /app/recipe.json recipe.json
+
+# Build dependencies with multiple cache layers:
+# 1. sccache: Cache individual compilation artifacts
+# 2. cargo registry: Cache downloaded crates
+# 3. cargo git: Cache git dependencies
+RUN --mount=type=cache,target=$SCCACHE_DIR,sharing=locked \
+    --mount=type=cache,target=/usr/local/cargo/registry \
+    --mount=type=cache,target=/usr/local/cargo/git \
+    cargo chef cook --release --recipe-path recipe.json
+
+# Copy source code and build application with caching
+COPY . .
+
+RUN --mount=type=cache,target=$SCCACHE_DIR,sharing=locked \
+    --mount=type=cache,target=/usr/local/cargo/registry \
+    --mount=type=cache,target=/usr/local/cargo/git \
+    cargo build --release --bin sample_api
+
+# Display sccache statistics for verification
+RUN sccache --show-stats
+
+# Stage 4: Runtime - Minimal production image
+FROM debian:bookworm-slim AS runtime
+
+# Install runtime dependencies
+RUN apt-get update && \
+    apt-get install -y \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Copy the compiled binary from builder
+COPY --from=builder /app/target/release/sample_api /usr/local/bin/sample_api
+
+# Set environment variables
+ENV RUST_LOG=info
+
+# Expose port
+EXPOSE 8080
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD ["/usr/local/bin/sample_api", "--version"] || exit 1
+
+# Run the application
+ENTRYPOINT ["/usr/local/bin/sample_api"]

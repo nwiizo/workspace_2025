@@ -1,0 +1,17 @@
+# syntax=docker/dockerfile:1
+
+# 最適化なし：シンプルなシングルステージビルド
+FROM rust:1.85
+
+WORKDIR /app
+
+# すべてのファイルをコピー
+COPY . .
+
+# ビルド（キャッシュなし）
+RUN cargo build --release
+
+EXPOSE 8000
+
+# rust:latestイメージをそのまま使用（巨大）
+CMD ["/app/target/release/rust-docker-demo"]
