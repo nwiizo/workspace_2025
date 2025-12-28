@@ -255,6 +255,11 @@ Temporary Items
 *.ori
 *.orig
 *.tmp
+*.backup
+
+# Blog drafts and working files
+samples/**/blog.md
+blogs/**/blog.md
 
 # Node.js
 node_modules/
