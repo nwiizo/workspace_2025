@@ -1,0 +1,24 @@
+[package]
+name = "analogy_failures"
+version = "0.1.0"
+edition = "2021"
+description = "ブログ記事「おい、類推するな」のサンプルコード"
+
+[dependencies]
+tokio = { version = "1", features = ["full"] }
+
+[[bin]]
+name = "ownership"
+path = "src/main.rs"
+
+[[bin]]
+name = "async_mutex"
+path = "src/async_mutex.rs"
+
+[[bin]]
+name = "async_deadlock"
+path = "src/async_deadlock.rs"
+
+[[bin]]
+name = "cache_race"
+path = "src/cache_race.rs"

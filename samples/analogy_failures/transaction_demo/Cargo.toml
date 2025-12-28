@@ -1,0 +1,17 @@
+[package]
+name = "transaction_demo"
+version = "0.1.0"
+edition = "2021"
+description = "トランザクション・キャッシュの類推失敗を実際のDBで検証"
+
+[dependencies]
+tokio = { version = "1", features = ["full"] }
+sqlx = { version = "0.8", features = ["runtime-tokio", "postgres"] }
+
+[[bin]]
+name = "transaction"
+path = "src/main.rs"
+
+[[bin]]
+name = "cache_race_db"
+path = "src/cache_race_db.rs"
